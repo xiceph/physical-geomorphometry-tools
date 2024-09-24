@@ -20,36 +20,6 @@ pub fn calculate(
     let zy2 = zy * zy;
     let zxy2 = zxy * zxy;
     let zx_zy = zx * zy;
-    let zx2_zy2 = zx2 + zy2;
-
-    let norm = zx2_zy2.sqrt();
-    let slope = norm.atan();
-    let sin_slope = slope.sin();
-    let cos_slope = slope.cos();
-    let cos_slope2 = cos_slope * cos_slope;
-
-    let angle = (zy).atan2(*zx);
-    let sin_aspect = angle.sin();
-    let cos_aspect = angle.cos();
-
-    let denom2 = 1.0 + zx2_zy2;  // for kns, knc, tgc
-    let kns_numerator = -1.0 * (zxx * zx2 + 2.0 * zxy * zx_zy + zyy * zy2);
-    let kns = kns_numerator / (zx2_zy2 * denom2.powf(1.5));
-
-    let knc_numerator = -1.0 * (zxx * zy2 - 2.0 * zxy * zx_zy + zyy * zx2);
-    let knc = knc_numerator / (zx2_zy2 * denom2.sqrt());
-
-    let tgc_numerator = zx_zy * (zxx - zyy) - zxy * (zx2 - zy2);
-    let tgc = tgc_numerator / (zx2_zy2 * denom2);
-
-    let denominator = 1.0 + zx2_zy2;
-    let numerator1 = (1.0 + zy2) * zxx - 2.0 * zxy * zx_zy + (1.0 + zx2) * zyy;
-    let term1 = numerator1 / (2.0 * denominator.powf(1.5));
-    let term2 = zxx * zyy - zxy2 / denominator.powi(2);
-    let sqrt = (term1.powi(2) - term2).sqrt();
-    let k_max = - term1 + sqrt;
-    let k_min = - term1 - sqrt;
-    let k_min2 = k_min * k_min;
 
     let a = zxy2 - zxx * zyy;
     let b = 2.0 * zx * (zxxy * zy + a) - zxxx * zy2 - zxyy * zx2;
@@ -59,10 +29,37 @@ pub fn calculate(
     let f = -2.0 * (zy * (zxyy * zx + zxy2 + zyy.powi(2)) + d * zx) - zyyy * zy2 - zxxy * zx2;
     let k = 2.0 * zxy * zx_zy - zxx * zy2 - zyy * zx2;
     let l = - zx2 * zxx - 2.0 * zxy * zx_zy - zy2 * zyy;
-    let m = zx2_zy2;
+    let m = zx2 + zy2;
     let n = zxx * zx + zxy * zy;
     let o = zyy * zy + zxy * zx;
     let p = 1.0 + m;
+
+    let norm = m.sqrt();
+    let slope = norm.atan();
+    let sin_slope = slope.sin();
+    let cos_slope = slope.cos();
+    let cos_slope2 = cos_slope * cos_slope;
+
+    let angle = (zy).atan2(*zx);
+    let sin_aspect = angle.sin();
+    let cos_aspect = angle.cos();
+
+    let kns_numerator = -1.0 * (zxx * zx2 + 2.0 * zxy * zx_zy + zyy * zy2);
+    let kns = kns_numerator / (m * p.powf(1.5));
+
+    let knc_numerator = -1.0 * (zxx * zy2 - 2.0 * zxy * zx_zy + zyy * zx2);
+    let knc = knc_numerator / (m * p.sqrt());
+
+    let tgc_numerator = zx_zy * (zxx - zyy) - zxy * (zx2 - zy2);
+    let tgc = tgc_numerator / (m * p);
+
+    let numerator1 = (1.0 + zy2) * zxx - 2.0 * zxy * zx_zy + (1.0 + zx2) * zyy;
+    let term1 = numerator1 / (2.0 * p.powf(1.5));
+    let term2 = zxx * zyy - zxy2 / p.powi(2);
+    let sqrt = (term1.powi(2) - term2).sqrt();
+    let k_max = - term1 + sqrt;
+    let k_min = - term1 - sqrt;
+    let k_min2 = k_min * k_min;
 
     let bmp = b * m * p;
     let npmn = 2.0 * n * p + m * n;
