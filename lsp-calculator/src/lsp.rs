@@ -32,15 +32,15 @@ pub fn calculate(
     let sin_aspect = angle.sin();
     let cos_aspect = angle.cos();
 
-    let denom = (zx2_zy2) * (1.0 + zx2_zy2);  // for kns, knc, tgc
+    let denom2 = 1.0 + zx2_zy2;  // for kns, knc, tgc
     let kns_numerator = -1.0 * (zxx * zx2 + 2.0 * zxy * zx_zy + zyy * zy2);
-    let kns = kns_numerator / denom.powf(1.5);
+    let kns = kns_numerator / (zx2_zy2 * denom2.powf(1.5));
 
     let knc_numerator = -1.0 * (zxx * zy2 - 2.0 * zxy * zx_zy + zyy * zx2);
-    let knc = knc_numerator / denom.sqrt();
+    let knc = knc_numerator / (zx2_zy2 * denom2.sqrt());
 
     let tgc_numerator = zx_zy * (zxx - zyy) - zxy * (zx2 - zy2);
-    let tgc = tgc_numerator / denom;
+    let tgc = tgc_numerator / (zx2_zy2 * denom2);
 
     let denominator = 1.0 + zx2_zy2;
     let numerator1 = (1.0 + zy2) * zxx - 2.0 * zxy * zx_zy + (1.0 + zx2) * zyy;
