@@ -45,7 +45,7 @@ Local second-order geomorphometric characteristics are defined by both the first
 
 **Land surface curvatures** (LSC) represent a somewhat heterogeneous set of second-order geomorphometric characteristics, expressing curvature in different ways. A thorough analysis of this set of characteristics, in terms of their definition, calculation, and interpretation, was conducted in the work of Minár et al. (2020)[^1]. Here, we build on the latest version of this system.
 
-![LSC](https://github.com/user-attachments/assets/3e47b184-37a7-46a6-86a5-7cc10621028e)
+![LSC](https://github.com/user-attachments/assets/fbbcd425-debc-4694-a9e1-dba437ced9e6)
 
 
 ### Normal slope line (profile) curvature – (_k<sub>n</sub>_)_<sub>s</sub>_
