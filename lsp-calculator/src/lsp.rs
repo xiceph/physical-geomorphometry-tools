@@ -55,7 +55,7 @@ pub fn calculate(
 
     let numerator1 = (1.0 + zy2) * zxx - 2.0 * zxy * zx_zy + (1.0 + zx2) * zyy;
     let term1 = numerator1 / (2.0 * p.powf(1.5));
-    let term2 = zxx * zyy - zxy2 / p.powi(2);
+    let term2 = (zxx * zyy - zxy2) / p.powi(2);
     let sqrt = (term1.powi(2) - term2).sqrt();
     let k_max = - term1 + sqrt;
     let k_min = - term1 - sqrt;
