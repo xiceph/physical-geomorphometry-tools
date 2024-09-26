@@ -50,56 +50,148 @@ Local second-order geomorphometric characteristics are defined by both the first
 
 ### Normal slope line (profile) curvature – (_k<sub>n</sub>_)_<sub>s</sub>_
 
+```math
+(k_n)_s = -\frac{z_{xx} z_x^2 + 2z_{xy} z_x z_y + z_{yy} z_y^2}{(z_x^2 + z_y^2) \sqrt{(1 + z_x^2 + z_y^2)^3}}
+```
+
 ### Normal contour (tangential) curvature – (_k<sub>n</sub>_)_<sub>c</sub>_
+
+```math
+(k_n)_c = -\frac{z_{xx} z_y^2 + 2z_{xy} z_x z_y + z_{yy} z_x^2}{(z_x^2 + z_y^2) \sqrt{1 + z_x^2 + z_y^2}}
+```
 
 ### Contour (geodesic) torsion – _𝜏<sub>c</sub>_
 
+```math
+(𝜏_g)_c = \frac{z_x z_y (z_{xx} - z_{yy}) - z_{xy} (z_x^2 - z_y^2)}{(z_x^2 + z_y^2) \ (1 + z_x^2 + z_y^2)}
+```
 
-### Second slope line derivative
+### Second slope line derivative - _z<sub>ss</sub>_
 
-### Slope line torsion
+```math
+z_{ss} = \frac{(k_n)_s}{\cos S^3}
+```
 
-### Second contour derivative
+### Slope line torsion – _𝜏<sub>s</sub>_
 
-### Projected contour curvature
+```math
+𝜏_s = \frac{(k_n)_s}{\cos S}
+```
 
-### Projected slope line curvature
+### Second contour derivative - _z<sub>cc</sub>_
 
-### Contour change of sine slope
+```math
+z_{cc} = \frac{(k_n)_c}{\cos S}
+```
 
+### Projected contour curvature – (_k<sub>p</sub>_)_<sub>c</sub>_
 
-### Difference curvature
+```math
+(k_p)_c = \frac{(k_n)_c}{\sin S}
+```
 
-### Total accumulation curvature
+### Projected slope line curvature – (_k<sub>p</sub>_)_<sub>s</sub>_
 
-### Total ring curvature
+```math
+(k_p)_s = \frac{\text(𝜏_g)_c}{(\sin S \cdot \cos S)}
+```
 
-### Horizontal excess curvature
+### Contour change of sine slope  – (sin _S_)_<sub>c</sub>_
 
-### Vertical excess curvature
+```math
+(sin S)_c = \text(𝜏_g)_c \cdot \cos S
+```
 
+### Difference curvature - _k<sub>d</sub>_
 
-### Maximal curvature
+```math
+k_d = \frac{(k_n)_s - (k_n)_c}{2}
+```
 
-### Minimal curvature
+### Total accumulation curvature - _K<sub>a</sub>_
 
+```math
+K_a = (k_n)_s \cdot (k_n)_c
+```
 
-### Gaussian curvature
+### Total ring curvature - _K<sub>r</sub>_
 
-### Elevation laplacian
+```math
+K_r = (k_n)_c \cdot (k_n)_s - k_{\text{min}} \cdot ((k_n)_c + (k_n)_s) + {k_\text{min}}^2
+```
 
-### Unsphericity curvature
+### Horizontal excess curvature - _k<sub>he</sub>_
 
-### Mean curvature
+```math
+k_{he} = (k_n)_c - k_{\text{min}}
+```
 
-### Casorati curvature
+### Vertical excess curvature - _k<sub>ve</sub>_
+
+```math
+k_{ve} = (k_n)_s - k_{\text{min}}
+```
+
+### Maximal curvature - _k<sub>max</sub>_
+
+```math
+k_{\text{max}} = - \frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2\sqrt{(1 + z_x^2 + z_y^2)^{3}}} + \sqrt{\left(\frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2\sqrt{(1 + z_x^2 + z_y^2)^{3}}}\right)^2 - \frac{z_{xx} z_{yy} - z_{xy}^2}{(1 + z_x^2 + z_y^2)^2}}
+```
+
+### Minimal curvature - _k<sub>min</sub>_
+
+```math
+k_{\text{min}} = - \frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2 \sqrt{(1 + z_x^2 + z_y^2)^{3}}} - \sqrt{\left(\frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2\sqrt{(1 + z_x^2 + z_y^2)^{3}}}\right)^2 - \frac{z_{xx} z_{yy} - z_{xy}^2}{(1 + z_x^2 + z_y^2)^2}}
+```
+
+### Gaussian curvature - _K_
+
+```math
+K = k_{\text{max}} \cdot k_{\text{min}}
+```
+
+### Elevation laplacian - _∇²z_
+
+```math
+∇²z = \frac{(k_n)_c \cdot \cos S^2 + (k_n)_s}{\cos S^3}
+```
+
+### Unsphericity curvature  - _k<sub>u</sub>_
+
+```math
+k_u = \frac{k_{\text{max}} - k_{\text{min}}}{2}
+```
+
+### Mean curvature  - _k<sub>mean</sub>_
+
+```math
+k_{\text{mean}} = \frac{(k_n)_s + (k_n)_c}{2} = \frac{k_{\text{max}} + k_{\text{min}}}{2}
+```
+
+### Casorati curvature  - _k<sub>c</sub>_
+
+```math
+k_c = \sqrt{\frac{k_{\text{max}}^2 + k_{\text{min}}^2}{2}}
+```
 
 ## Third-Order Parameters
 
-### Contour change of normal contour curvature
+### Contour change of normal contour curvature – (_k<sub>n</sub>_)_<sub>cc</sub>_
 
-### Slope line change of normal contour curvature
+```math
+(k_n)_{cc} = \frac {z_y \left( BMP - K(2NP + MN)\right) - z_x \left( CMP - K(2OP + MO) \right)}{\sqrt{P^3} \sqrt{M^5}}
+```
 
-### Slope line change of normal slope line curvature
+### Slope line change of normal contour curvature – (_k<sub>n</sub>_)_<sub>cs</sub>_
+
+```math
+(k_n)_{cs} = \frac {z_x \left( K(2NP + MN) - BMP \right) - z_y \left( CMP - K(2OP + MO) \right)}{\sqrt{P^3} \sqrt{M^5}}
+```
+
+### Slope line change of normal slope line curvature – (_k<sub>n</sub>_)_<sub>ss</sub>_
+
+```math
+(k_n)_{ss} = \frac {P (z_x \left(2LN - EM \right) - z_y \left( FM - 2 LO \right)) + 3LM(z_y O + z_x N)}{\sqrt{P^5} \sqrt{M^5}}
+```
 
 [^1]: Minár, J., Evans, I. S., & Jenčo, M. (2020). A comprehensive system of definitions of land surface (topographic) curvatures, with implications for their application in geoscience modelling and prediction. Earth-Science Reviews, 211, 103414. https://doi.org/10.1016/j.earscirev.2020.103414
