@@ -50,8 +50,8 @@ pub fn calculate(
     let knc_numerator = -1.0 * (zxx * zy2 - 2.0 * zxy * zx_zy + zyy * zx2);
     let knc = knc_numerator / (m * p.sqrt());
 
-    let tgc_numerator = zx_zy * (zxx - zyy) - zxy * (zx2 - zy2);
-    let tgc = tgc_numerator / (m * p);
+    let tc_numerator = zx_zy * (zxx - zyy) - zxy * (zx2 - zy2);
+    let tc = tc_numerator / (m * p);
 
     let numerator1 = (1.0 + zy2) * zxx - 2.0 * zxy * zx_zy + (1.0 + zx2) * zyy;
     let term1 = numerator1 / (2.0 * p.powf(1.5));
@@ -131,17 +131,17 @@ pub fn calculate(
         // Calculate Projected contour curvature
         value = knc / sin_slope;
       },
-      "tgc" => {
+      "tc" => {
         // Use the Contour geodesic torsion
-        value = tgc;
+        value = tc;
       },
       "kps" => {
         // Calculate Projected slope line curvature
-        value = tgc / (sin_slope * cos_slope);
+        value = tc / (sin_slope * cos_slope);
       },
       "sin_sc" => {
         // Calculate Contour change of sin slope
-        value = tgc * cos_slope;
+        value = tc * cos_slope;
       },
       "el" => {
         // Calculate Elevation laplacian

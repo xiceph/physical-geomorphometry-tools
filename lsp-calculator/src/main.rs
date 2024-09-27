@@ -44,8 +44,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Basic trio of curvatures
     ("kns", "Normal slope line (profile) curvature"),
     ("knc", "Normal contour (tangential) curvature"),
-    ("tgc", "Contour geodesic torsion"),
-    // Subforms
+    ("tc", "Contour torsion"),
+    // Subforms of Basic trio
     ("zss", "Second slope line derivative"),
     ("ts", "Slope line torsion"),
     ("zcc", "Second contour derivative"),
@@ -75,9 +75,9 @@ fn main() -> Result<(), Box<dyn Error>> {
   //let total_parameters = parameters.len();
 
   let group_first = vec!["slope", "aspect", "sin_slope", "sin_aspect", "cos_aspect"];
-  let group_second = vec!["kns", "knc", "tgc", "zss", "ts", "zcc", "kpc", "kps", "sin_sc", "kd", "ka", "kr", "khe", "kve", "k_max", "k_min", "k", "el", "ku", "k_mean", "kc"];
+  let group_second = vec!["kns", "knc", "tc", "zss", "ts", "zcc", "kpc", "kps", "sin_sc", "kd", "ka", "kr", "khe", "kve", "k_max", "k_min", "k", "el", "ku", "k_mean", "kc"];
   let group_third = vec!["knss", "kncc", "kncs"];
-  let group_segmentation = vec!["sin_slope", "sin_aspect", "cos_aspect", "kns", "knc", "tgc", "knss", "kncc", "kncs"];
+  let group_segmentation = vec!["sin_slope", "sin_aspect", "cos_aspect", "kns", "knc", "tc", "knss", "kncc", "kncs"];
   
   let mut app = Command::new("Land Surface Parameters Calculator")
   .version(env!("CARGO_PKG_VERSION"))

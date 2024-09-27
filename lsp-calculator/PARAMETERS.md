@@ -2,7 +2,7 @@
 
 This page provides a list of Land Surface Parameters (LSPs) calculated by the `Land Surface Parameters Calculator` tool, along with detailed descriptions of each parameter's characteristics and equations.
 
-All presented LSPs are local characteristics that can be defined (using differential geometry) in an infinitely small neighborhood of a given point. Most of them are functions of directional derivatives (changes) of elevation (zero-order characteristics) along the slope line and the contour line. LSPs are categorized into subsets based on the maximum order of derivatives used for their calculation.
+All presented LSPs are local characteristics that can be defined (using differential geometry) in an infinitely small neighborhood of a given point. Most of them are functions of directional derivatives (changes) of elevation (zero-order characteristics) along the slope line and the contour line. LSPs are categorized into subsets based on the maximum order of derivatives used for their calculation. We denote the partial derivatives of the elevation z as follows $z_x = \frac{\partial z}{\partial x}$, $z_y = \frac{\partial z}{\partial y}$, $z_{xx} =\frac{\partial^2 z}{\partial x^2}$, $z_{xy} =\frac{\partial^2 z}{\partial x \partial y}$, $z_{yy} =\frac{\partial^2 z}{\partial x^2}$, $z_{xxx} =\frac{\partial^3 z}{\partial x^3}$, $z_{xxy} =\frac{\partial^3 z}{\partial x^2 \partial y}$, $z_{xyy} =\frac{\partial^3 z}{\partial x \partial y^2}$, $z_{yyy} =\frac{\partial^3 z}{\partial y^3}$.
 
 
 ## First-Order Parameters
@@ -45,7 +45,8 @@ Local second-order geomorphometric characteristics are defined by both the first
 
 **Land surface curvatures** (LSC) represent a somewhat heterogeneous set of second-order geomorphometric characteristics, expressing curvature in different ways. A thorough analysis of this set of characteristics, in terms of their definition, calculation, and interpretation, was conducted in the work of Minár et al. (2020)[^1]. Here, we build on the latest version of this system.
 
-![LSC](https://github.com/user-attachments/assets/fbbcd425-debc-4694-a9e1-dba437ced9e6)
+![LSC](https://github.com/user-attachments/assets/25041a4d-9608-42dc-90a1-b679080c241e)
+
 
 
 ### Normal slope line (profile) curvature – (_k<sub>n</sub>_)_<sub>s</sub>_
@@ -60,7 +61,7 @@ Local second-order geomorphometric characteristics are defined by both the first
 (k_n)_c = -\frac{z_{xx} z_y^2 + 2z_{xy} z_x z_y + z_{yy} z_x^2}{(z_x^2 + z_y^2) \sqrt{1 + z_x^2 + z_y^2}}
 ```
 
-### Contour (geodesic) torsion – _𝜏<sub>c</sub>_
+### Contour torsion – _𝜏<sub>c</sub>_
 
 ```math
 𝜏_c = \frac{z_x z_y (z_{xx} - z_{yy}) - z_{xy} (z_x^2 - z_y^2)}{(z_x^2 + z_y^2) \ (1 + z_x^2 + z_y^2)}
@@ -93,13 +94,13 @@ z_{cc} = \frac{(k_n)_c}{\cos S}
 ### Projected slope line curvature – (_k<sub>p</sub>_)_<sub>s</sub>_
 
 ```math
-(k_p)_s = \frac{\text(𝜏_g)_c}{(\sin S \cdot \cos S)}
+(k_p)_s = \frac{\text𝜏_c}{(\sin S \cdot \cos S)}
 ```
 
-### Contour change of sine slope  – (sin _S_)_<sub>c</sub>_
+### Contour change of sine slope  – (sin _S_)_<sub>c</sub>_
 
 ```math
-(sin S)_c = \text(𝜏_g)_c \cdot \cos S
+(\sin S)_c = \text𝜏_c \cdot \cos S
 ```
 
 ### Difference curvature - _k<sub>d</sub>_
