@@ -24,7 +24,7 @@ The tool leverages polynomial approximations to derive various local LSPs, such 
     - Normal contour (tangential) curvature
     - Contour geodesic torsion
 
-  - **Subforms**:
+  - **Subforms of Basic Trio**:
     - Second slope line derivative
     - Slope line torsion
     - Second contour derivative
@@ -55,7 +55,7 @@ The tool leverages polynomial approximations to derive various local LSPs, such 
     - Slope line change of normal contour curvature
     - Slope line change of normal slope line curvature
 
-  For more detailed information on each parameter, please refer to the [LSPs description page](./PARAMETERS.md).
+  _For more detailed information on each parameter, please refer to the [LSPs description page](./PARAMETERS.md)._
 
 - **Input and Output**:
   - Supports input from a GeoTIFF raster file.
