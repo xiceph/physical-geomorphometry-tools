@@ -2,7 +2,7 @@
 
 This page provides a list of Land Surface Parameters (LSPs) calculated by the `Land Surface Parameters Calculator` tool, along with detailed descriptions of each parameter's characteristics and equations.
 
-All presented LSPs are local characteristics that can be defined (using differential geometry) in an infinitely small neighborhood of a given point. They represent directional derivatives (changes) of elevation (zero-order characteristics) along the slope line and the contour line. LSPs are categorized into subsets based on the maximum order of derivatives used for their calculation.
+All presented LSPs are local characteristics that can be defined (using differential geometry) in an infinitely small neighborhood of a given point. Most of them are functions of directional derivatives (changes) of elevation (zero-order characteristics) along the slope line and the contour line. LSPs are categorized into subsets based on the maximum order of derivatives used for their calculation.
 
 
 ## First-Order Parameters
@@ -41,7 +41,7 @@ The cosine of the aspect _A_ represents the _x_-coordinate of the elevation grad
 
 ## Second-Order Parameters
 
-Local second-order geomorphometric characteristics are defined by both the first ($z_x$, $z_y$) and second ($z_{xx}$, $z_{xy}$, $z_{yy}$) partial derivatives of the elevation field. Second-order characteristics describe the spatial changes in first-order characteristics. The vast majority of them describe various forms of surface curvature.
+Local second-order geomorphometric characteristics are defined by both the first ($z_x$, $z_y$) and second ($z_{xx}$, $z_{xy}$, $z_{yy}$) partial derivatives of the elevation field. Most of second-order characteristics describe the spatial changes in first-order characteristics. The vast majority of them describe various forms of surface curvature.
 
 **Land surface curvatures** (LSC) represent a somewhat heterogeneous set of second-order geomorphometric characteristics, expressing curvature in different ways. A thorough analysis of this set of characteristics, in terms of their definition, calculation, and interpretation, was conducted in the work of Minár et al. (2020)[^1]. Here, we build on the latest version of this system.
 
@@ -63,7 +63,7 @@ Local second-order geomorphometric characteristics are defined by both the first
 ### Contour (geodesic) torsion – _𝜏<sub>c</sub>_
 
 ```math
-(𝜏_g)_c = \frac{z_x z_y (z_{xx} - z_{yy}) - z_{xy} (z_x^2 - z_y^2)}{(z_x^2 + z_y^2) \ (1 + z_x^2 + z_y^2)}
+𝜏_c = \frac{z_x z_y (z_{xx} - z_{yy}) - z_{xy} (z_x^2 - z_y^2)}{(z_x^2 + z_y^2) \ (1 + z_x^2 + z_y^2)}
 ```
 
 ### Second slope line derivative - _z<sub>ss</sub>_
