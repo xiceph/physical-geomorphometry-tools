@@ -22,7 +22,7 @@ The tool leverages polynomial approximations to derive various local LSPs, such 
   - **Basic Trio of Curvatures**:
     - Normal slope line (profile) curvature
     - Normal contour (tangential) curvature
-    - Contour geodesic torsion
+    - Contour torsion
 
   - **Subforms of Basic Trio**:
     - Second slope line derivative
@@ -96,7 +96,7 @@ Or select a subset of parameters to compute (one or more options):
 - `--first`: First-order Land Surface Parameters
 - `--second`: Second-order Land Surface Parameters
 - `--third`: Third-order Land Surface Parameters
-- `--for_segmentation`: Land Surface Parameters for Land Surface Segmentation (Sine of Slope, Sine of Aspect, Cosine of Aspect, Normal slope line curvature, Normal contour curvature, Contour geodesic torsion, Contour change of normal contour curvature, Slope line change of normal contour curvature,  Slope line change of normal slope line curvature)
+- `--for_segmentation`: Land Surface Parameters for Land Surface Segmentation (Sine of Slope, Sine of Aspect, Cosine of Aspect, Normal slope line curvature, Normal contour curvature, Contour torsion, Contour change of normal contour curvature, Slope line change of normal contour curvature,  Slope line change of normal slope line curvature)
 
 ### Individual Selection of Calculated Parameters
 
@@ -109,7 +109,7 @@ You can choose one or more specific parameters to calculate using the following 
 - `--cos_aspect`: Cosine of Aspect
 - `--kns`: Normal slope line (profile) curvature
 - `--knc`: Normal contour (tangential) curvature
-- `--tgc`: Contour geodesic torsion
+- `--tc`: Contour torsion
 - `--zss`: Second slope line derivative
 - `--ts`: Slope line torsion
 - `--zcc`: Second contour derivative
