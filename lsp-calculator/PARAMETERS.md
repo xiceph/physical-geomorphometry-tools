@@ -2,7 +2,7 @@
 
 This page provides a list of Land Surface Parameters (LSPs) calculated by the `Land Surface Parameters Calculator` tool, along with detailed descriptions of each parameter's characteristics and equations.
 
-All presented LSPs are local characteristics that can be defined (using differential geometry) in an infinitely small neighborhood of a given point. Most of them are functions of directional derivatives (changes) of elevation (zero-order characteristics) along the slope line and the contour line. LSPs are categorized into subsets based on the maximum order of derivatives used for their calculation.
+All presented LSPs are local characteristics that can be defined (using differential geometry) in an infinitely small neighborhood of a given point. Most of them are functions of directional derivatives (changes) of elevation (zero-order characteristics) along the slope line and the contour line. LSPs are categorized into subsets based on the maximum order of derivatives used for their calculation. We denote the partial derivatives of the elevation z as follows $z_x = \frac{\partial z}{\partial x}$, $z_y = \frac{\partial z}{\partial y}$, $z_xx =\frac{\partial^2 z}{\partial x^2}, $z_xy =\frac{\partial^2 z}{\partial x \partial y}, $z_yy =\frac{\partial^2 z}{\partial x^2}, $z_xxx =\frac{\partial^3 z}{\partial x^3}, $z_xxy =\frac{\partial^3 z}{\partial x^2 \partial y}, $z_xyy =\frac{\partial^3 z}{\partial x \partial y^2}, $z_yyy =\frac{\partial^3 z}{\partial y^3}.
 
 
 ## First-Order Parameters
@@ -94,13 +94,13 @@ z_{cc} = \frac{(k_n)_c}{\cos S}
 ### Projected slope line curvature – (_k<sub>p</sub>_)_<sub>s</sub>_
 
 ```math
-(k_p)_s = \frac{\text(𝜏_g)_c}{(\sin S \cdot \cos S)}
+(k_p)_s = \frac{\text𝜏_c}{(\sin S \cdot \cos S)}
 ```
 
-### Contour change of sine slope  – (sin _S_)_<sub>c</sub>_
+### Contour change of sine slope  – (sin _S_)_<sub>c</sub>_
 
 ```math
-(sin S)_c = \text(𝜏_g)_c \cdot \cos S
+(\sin S)_c = \text𝜏_c \cdot \cos S
 ```
 
 ### Difference curvature - _k<sub>d</sub>_
