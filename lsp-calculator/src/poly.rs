@@ -25,7 +25,6 @@ pub fn precompute_basis_functions(degree: usize, d_x: f64, d_y: f64) -> DMatrix<
           // Compute x^px * y^py for each basis function
           basis_functions[(idx, func_idx)] = x.powi(px as i32) * y.powi(py as i32);
           func_idx += 1;
-          //if i == 0 && j == 0 {println!("px, py: {}, {}", px, py)};
         }
       }
     }
@@ -76,7 +75,7 @@ pub fn poly_lsq_der_with_precomputed(
     panic!("Dimension mismatch between precomputed basis functions and matrix M.");
   }
   
-  // Definition of derivatives for a 3rd degree polynomial
+  // Definition of derivatives for a 3rd degree
   let deriv_x = vec![0, 1, 0, 2, 1, 0, 3, 2, 1, 0];
   let deriv_y = vec![0, 0, 1, 0, 1, 2, 0, 1, 2, 3];
   let mut derivatives = vec![0.0; 10];  // We want to compute only 10 derivatives
