@@ -176,6 +176,76 @@ k_c = \sqrt{\frac{k_{\text{max}}^2 + k_{\text{min}}^2}{2}}
 ```
 
 ## Third-Order Parameters
+Simplification:
+```math
+A = z_{xy}^2 - z_{xx} z_{yy}
+```
+
+```math
+B = 2 z_x (z_{xxy} z_y + A) - z_{xxx} z_y^2 - z_{xyy} z_x^2 
+```
+
+```math
+C = 2 z_y (z_{xyy} z_x + A) - z_{xxy} z_y^2 - z_{xxx} - z_{yyy} z_x^2 
+```
+
+```math
+D = z_{xy} (z_{xx} + z_{yy})
+```
+
+```math
+E = -2 (z_x (z_{xxy} z_y + z_{xy}^2 + z_{xx}^2)+ D z_y) - z_{xxx} z_x^2 - z_{xyy} z_y^2 
+```
+
+```math
+F = -2 (z_y (z_{xyy} z_x + z_{xy}^2 + z_{yy}^2)+ D z_x) - z_{yyy} z_y^2 - z_{xxy} z_x^2 
+```
+
+```math
+G = z_y^2 - z_x^2
+```
+
+```math
+H = z_{xx} - z_{yy}
+```
+
+```math
+I = z_{xxy} G+2 z_{xy} (z_{xy} z_y-z_{xx} z_x) + (z_{xx} z_y+z_{xy} z_x) H +z_x z_y (z_{xxx}-z_{xyy})
+```
+
+```math
+J = z_{xyy} G+2 z_{xy} (z_{yy} z_y-z_{xy} z_x) + (z_{xy} z_y+z_{yy} z_x) H +z_x z_y (z_{xxy}-z_{yyy})
+```
+
+```math
+K = 2 z_{xy} z_x z_y-z_{xx} z_y^2-z_{yy} z_x^2
+```
+
+```math
+L = - z_x^2 z_{xx} - 2 z_{xy}z_xz_y - z_y^2-z_{yy}
+```
+
+```math
+M = z_x^2+z_y^2
+```
+
+```math
+N = z_{xx} z_x+z_{xy} z_y
+```
+
+```math
+O = z_{yy} z_y+z_{xy} z_x
+```
+
+```math
+P = 1+M
+```
+
+```math
+R = z_x z_y H+z_{xy} G
+```
+
+
 
 ### Contour change of normal contour curvature – (_k<sub>n</sub>_)_<sub>cc</sub>_
 
