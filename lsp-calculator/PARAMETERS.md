@@ -51,11 +51,15 @@ Local second-order geomorphometric characteristics are defined by both the first
 
 ### Normal slope line (profile) curvature – (_k<sub>n</sub>_)_<sub>s</sub>_
 
+Change of sine of slope (flow energy) in direction of slope line. Expression of energy of flow acceleration (change of flow energy to unit map distance). 
+
 ```math
 (k_n)_s = -\frac{z_{xx} z_x^2 + 2z_{xy} z_x z_y + z_{yy} z_y^2}{(z_x^2 + z_y^2) \sqrt{(1 + z_x^2 + z_y^2)^3}}
 ```
 
 ### Normal contour (tangential) curvature – (_k<sub>n</sub>_)_<sub>c</sub>_
+
+Divergence of slope lines multiplied by sine of slope. Expression of the energy of flow concentration.
 
 ```math
 (k_n)_c = -\frac{z_{xx} z_y^2 + 2z_{xy} z_x z_y + z_{yy} z_x^2}{(z_x^2 + z_y^2) \sqrt{1 + z_x^2 + z_y^2}}
@@ -63,11 +67,15 @@ Local second-order geomorphometric characteristics are defined by both the first
 
 ### Contour torsion – _𝜏<sub>c</sub>_
 
+Change of slope in direction of contour line. Total measure of gravity discordant curvature contained in principal curvatures (_k<sub>max</sub>_ and _k<sub>min</sub>_) but not in gravity principal curvatures (_k<sub>n</sub>_)_<sub>s</sub>_ and (_k<sub>n</sub>_)_<sub>t</sub>_. 
+
 ```math
 𝜏_c = \frac{z_x z_y (z_{xx} - z_{yy}) - z_{xy} (z_x^2 - z_y^2)}{(z_x^2 + z_y^2) \ (1 + z_x^2 + z_y^2)}
 ```
 
 ### Second slope line derivative - _z<sub>ss</sub>_
+
+Second derivative of elevation, change of tangent of slope (map projection of the flow energy) in direction of slope line, expressing projected energy of flow acceleration.
 
 ```math
 z_{ss} = \frac{(k_n)_s}{\cos S^3}
@@ -75,23 +83,31 @@ z_{ss} = \frac{(k_n)_s}{\cos S^3}
 
 ### Slope line torsion – _𝜏<sub>s</sub>_
 
+Change of slope in direction of slope line. A projection of the energy of flow acceleration.
+
 ```math
 𝜏_s = \frac{(k_n)_s}{\cos S}
 ```
 
 ### Second contour derivative - _z<sub>cc</sub>_
 
+Second derivative of elevation. Projection of the energy of flow concentration to the map.
+
 ```math
 z_{cc} = \frac{(k_n)_c}{\cos S}
 ```
 
-### Projected contour curvature – (_k<sub>p</sub>_)_<sub>c</sub>_
+### Projected contour (plan) curvature – (_k<sub>p</sub>_)_<sub>c</sub>_
+
+Slope lines divergence → gravity flow divergence. 
 
 ```math
 (k_p)_c = \frac{(k_n)_c}{\sin S}
 ```
 
-### Projected slope line curvature – (_k<sub>p</sub>_)_<sub>s</sub>_
+### Projected slope line curvature (rotor) – (_k<sub>p</sub>_)_<sub>s</sub>_
+
+Curvature of slope lines in map. Change of the aspect in direction of slope line. A measure of flow line twisting. 
 
 ```math
 (k_p)_s = \frac{\text𝜏_c}{(\sin S \cdot \cos S)}
@@ -99,11 +115,15 @@ z_{cc} = \frac{(k_n)_c}{\cos S}
 
 ### Contour change of sine slope  – (sin _S_)_<sub>c</sub>_
 
+General expression of gravity discordant (twisting) energy of flow (change of flow energy in contour direction).
+
 ```math
 (\sin S)_c = \text𝜏_c \cdot \cos S
 ```
 
 ### Difference curvature - _k<sub>d</sub>_
+
+Expression of summary energetic effect of profile and plan curvature on energy of gravity flow (local excess of flow energy).
 
 ```math
 k_d = \frac{(k_n)_s - (k_n)_c}{2}
@@ -111,11 +131,15 @@ k_d = \frac{(k_n)_s - (k_n)_c}{2}
 
 ### Total accumulation curvature - _K<sub>a</sub>_
 
+Product of gravity principal curvatures (_k<sub>n</sub>_)_<sub>s</sub>_ and (_k<sub>n</sub>_)_<sub>c</sub>_, expression of simplicity (linearity) at least in one of the gravity-principal directions.
+
 ```math
 K_a = (k_n)_s \cdot (k_n)_c
 ```
 
 ### Total ring curvature - _K<sub>r</sub>_
+
+Square of the contour torsion _𝜏<sub>c</sub>_, product of vertical and horizontal excess curvature _k<sub>ve</sub>_ and _k<sub>he</sub>_. Measure of flow line twisting.
 
 ```math
 K_r = (k_n)_c \cdot (k_n)_s - k_{\text{min}} \cdot ((k_n)_c + (k_n)_s) + {k_\text{min}}^2
@@ -123,11 +147,15 @@ K_r = (k_n)_c \cdot (k_n)_s - k_{\text{min}} \cdot ((k_n)_c + (k_n)_s) + {k_\tex
 
 ### Horizontal excess curvature - _k<sub>he</sub>_
 
+Partial measure of gravity discordant curvature expressing difference between basic profile curvature (_k<sub>n</sub>_)_<sub>s</sub>_ and minimal curvature _k<sub>min</sub>_.
+
 ```math
 k_{he} = (k_n)_c - k_{\text{min}}
 ```
 
 ### Vertical excess curvature - _k<sub>ve</sub>_
+
+Partial measure of gravity discordant curvature expressing difference between basic plan curvature (_k<sub>n</sub>_)_<sub>c</sub>_ and minimal curvature _k<sub>min</sub>_.
 
 ```math
 k_{ve} = (k_n)_s - k_{\text{min}}
@@ -135,11 +163,15 @@ k_{ve} = (k_n)_s - k_{\text{min}}
 
 ### Maximal curvature - _k<sub>max</sub>_
 
+Maximal curvature of normal section in given point determining first of the principal directions of surface deformation.
+
 ```math
 k_{\text{max}} = - \frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2\sqrt{(1 + z_x^2 + z_y^2)^{3}}} + \sqrt{\left(\frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2\sqrt{(1 + z_x^2 + z_y^2)^{3}}}\right)^2 - \frac{z_{xx} z_{yy} - z_{xy}^2}{(1 + z_x^2 + z_y^2)^2}}
 ```
 
 ### Minimal curvature - _k<sub>min</sub>_
+
+Minimal curvature of normal section in given point determining second of the principal directions of surface deformation.
 
 ```math
 k_{\text{min}} = - \frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2 \sqrt{(1 + z_x^2 + z_y^2)^{3}}} - \sqrt{\left(\frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{yy}}{2\sqrt{(1 + z_x^2 + z_y^2)^{3}}}\right)^2 - \frac{z_{xx} z_{yy} - z_{xy}^2}{(1 + z_x^2 + z_y^2)^2}}
@@ -147,11 +179,15 @@ k_{\text{min}} = - \frac{(1 + z_y^2) z_{xx} - 2 z_{xy} z_x z_y + (1 + z_x^2) z_{
 
 ### Gaussian curvature - _K_
 
+Product of principal curvatures _k<sub>max</sub>_ and _k<sub>min</sub>_, expression of simplicity (linearity) at least in one of principal directions. The only intrinsic curvature (detectable by a 2D observer) of the land surface.
+
 ```math
 K = k_{\text{max}} \cdot k_{\text{min}}
 ```
 
 ### Elevation laplacian - _∇²z_
+
+Double of mean of second derivatives of elevation. Map projection of diffusion energy of surface adequately describing the change of elevation with time.
 
 ```math
 ∇²z = \frac{(k_n)_c \cdot \cos S^2 + (k_n)_s}{\cos S^3}
@@ -159,17 +195,23 @@ K = k_{\text{max}} \cdot k_{\text{min}}
 
 ### Unsphericity curvature  - _k<sub>u</sub>_
 
+Difference of _k<sub>max</sub>_ and _k<sub>min</sub>_ expressing how far a surface is from a sphere (surface with minimal surface energy). Measure of general curvature anisotropy.
+
 ```math
 k_u = \frac{k_{\text{max}} - k_{\text{min}}}{2}
 ```
 
 ### Mean curvature  - _k<sub>mean</sub>_
 
+Mean of all normal curvatures. Measure of diffusion energy (potential local energy on the land surface applicable to diffusion).
+
 ```math
 k_{\text{mean}} = \frac{(k_n)_s + (k_n)_c}{2} = \frac{k_{\text{max}} + k_{\text{min}}}{2}
 ```
 
 ### Casorati curvature  - _k<sub>c</sub>_
+
+Measure of general curvedness of a surface, regardless of the sign of curvature (general nonlinearity) and integral expression of energies of all curvatures.
 
 ```math
 k_c = \sqrt{\frac{k_{\text{max}}^2 + k_{\text{min}}^2}{2}}
@@ -249,17 +291,23 @@ R = z_x z_y H+z_{xy} G
 
 ### Contour change of normal contour curvature – (_k<sub>n</sub>_)_<sub>cc</sub>_
 
+Expression of change of energy of flow concentration in contour direction.
+
 ```math
 (k_n)_{cc} = \frac {z_y \left( BMP - K(2NP + MN)\right) - z_x \left( CMP - K(2OP + MO) \right)}{\sqrt{P^3} \sqrt{M^5}}
 ```
 
 ### Slope line change of normal contour curvature – (_k<sub>n</sub>_)_<sub>cs</sub>_
 
+Expression of downstream change of energy of flow concentration.
+
 ```math
 (k_n)_{cs} = \frac {z_x \left( K(2NP + MN) - BMP \right) - z_y \left( CMP - K(2OP + MO) \right)}{\sqrt{P^3} \sqrt{M^5}}
 ```
 
 ### Slope line change of normal slope line curvature – (_k<sub>n</sub>_)_<sub>ss</sub>_
+
+Expression of downstream change of energy of flow acceleration (jerk or jolt).
 
 ```math
 (k_n)_{ss} = \frac {P (z_x \left(2LN - EM \right) - z_y \left( FM - 2 LO \right)) + 3LM(z_y O + z_x N)}{\sqrt{P^5} \sqrt{M^5}}
