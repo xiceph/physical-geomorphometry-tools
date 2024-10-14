@@ -1,4 +1,4 @@
-# Physical geomorphometry
+# Physical Geomorphometry Tools
 
 **Physical geomorphometry** is a specialized subfield of geomorphometry that investigates the land surface using the fundamental principles, practices, and concepts of physics such as dimension, energy, work, force, thermodynamics, and equilibria. Unlike descriptive geomorphometry, which focuses on descriptive statistics, physical geomorphometry emphasizes the physical interpretation of land surface features.
 
@@ -24,7 +24,7 @@ The project delivers a series of independently usable components that collective
 
 ## Project Structure
 
-Each major topic is addressed through a dedicated software package available in the following subdirectories:
+Each major topic is addressed through a dedicated software package (tool) available in the following subdirectories:
 
 - [generalization](https://github.com/xiceph/physical-geomorphometry/tree/main/generalization) – Tool for generalizing DEMs.
 - [lsp-calculator](https://github.com/xiceph/physical-geomorphometry/tree/main/lsp-calculator) – Software for the calculation of LSPs.
