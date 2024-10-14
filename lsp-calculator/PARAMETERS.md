@@ -218,7 +218,10 @@ k_c = \sqrt{\frac{k_{\text{max}}^2 + k_{\text{min}}^2}{2}}
 ```
 
 ## Third-Order Parameters
-Simplification:
+
+Local geomorphometric characteristics of the third order are defined by the first, second, and third partial derivatives of the elevation field. Since most second-order characteristics are referred to as curvatures, third-order characteristics, which describe their spatial variations, are termed changes of curvatures.
+
+Due to the increased complexity of mathematical relationships in third-order parameters, we use the following substitutions for recurring elements:
 ```math
 A = z_{xy}^2 - z_{xx} z_{yy}
 ```
