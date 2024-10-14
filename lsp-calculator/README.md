@@ -183,7 +183,7 @@ To use this tool, you'll need to build it from the source code. Follow these ste
 #### Building
 
 ```bash
-git clone https://github.com/your-repository/land-surface-parameters-calculator.git
+git clone https://github.com/xiceph/physical-geomorphometry-tools/land-surface-parameters-calculator.git
 cd land-surface-parameters-calculator
 cargo build --release
 ```
