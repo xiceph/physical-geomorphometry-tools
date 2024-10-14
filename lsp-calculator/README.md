@@ -182,12 +182,14 @@ To use this tool, you'll need to build it from the source code. Follow these ste
 
 #### Building
 
+Clone the repository, navigate to the tool, and compile it:
+
 ```bash
-git clone https://github.com/xiceph/physical-geomorphometry-tools/land-surface-parameters-calculator.git
-cd land-surface-parameters-calculator
+git clone https://github.com/xiceph/physical-geomorphometry-tools.git
+cd physical-geomorphometry-tools/lsp-calculator/
 cargo build --release
 ```
-These steps will download and compile the tool. The compiled binary will be located in the `target/release` directory.
+The compiled binary will be located in the `target/release` directory.
 
 ### Running the Tool
 
