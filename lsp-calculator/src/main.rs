@@ -13,6 +13,7 @@ use nalgebra::DMatrix;
 mod poly;
 mod lsp;
 mod raster;
+mod geo;
 mod text;
 
 // The function generates text for individual parameter selection.
@@ -273,6 +274,10 @@ fn main() -> Result<(), Box<dyn Error>> {
   
   let geotransform = dataset.geo_transform().unwrap();
   let projection = dataset.projection();
+  let is_geographic = match dataset.spatial_ref() {
+    Ok(ref_sys) => ref_sys.is_geographic(),
+    Err(_) => false,
+  };
   
   let rasterband: RasterBand = dataset.rasterband(1).unwrap();
   let no_data = rasterband.no_data_value();
@@ -285,6 +290,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     height: height,
     origin: [ geotransform[0], geotransform[3] ],
     resolution: [ geotransform[1], geotransform[5] ],
+    is_geographic: is_geographic,
     nodata: no_data.unwrap_or(-9999.0),
   };
   
@@ -304,18 +310,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut indices: Vec<usize> = Vec::with_capacity(25);
     let mut z: Vec<f64> = Vec::with_capacity(25);
     
-    // Loop through the 5x5 grid
-    for i in 0..5 {
-      if let Some(row) = rows[i] {
-        for j in 0..5 {
-          let col_offset = col_index as isize + j as isize - 2;
+    // Loop through the 5x5 grid (rows, cols)
+    for y in 0..5 {
+      if let Some(row) = rows[y] {
+        for x in 0..5 {
+          let col_offset = col_index as isize + x as isize - 2;
           // Check if the column index is within bounds
           if col_offset >= 0 && col_offset < row.len() as isize {
             let z_value = row.get(col_offset as usize).unwrap();
             // Skip NoData values
             if !raster_params.is_nodata((*z_value).into()) {
-              // Calculate the grid index based on i and j
-              let idx = i * 5 + j;
+              // Calculate the grid index based on y and x
+              let idx = y * 5 + x;
               // Add the index and corresponding z value
               indices.push(idx);
               z.push((*z_value).into());
@@ -332,6 +338,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   // Calculate the Land Surface Parameters (LSPs) for each row using its neighboring rows
   fn calc_row_lsp(
     rows: [Option<&Vec<f32>>; 5],         // Array of 5 optional references to row vectors
+    row_index: usize,                     // Current row index
     raster_params: raster::RasterParams,  // Raster metadata
     selected_params: &Vec<String>,        // A vector of strings representing the selected LSPs
     precomputed_bf: &DMatrix<f64>,        // Precomputed basis functions matrix
@@ -341,6 +348,33 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut row_data = Vec::with_capacity(raster_params.width);
     
     let current_row = rows[2];
+    let num_basis_functions = precomputed_bf.ncols();
+    let (basis_functions, m);
+
+    if precomputed_bf.nrows() == 0 { // If no precomputed values are available (geographic coordinates case)
+      // Determine the degree of the polynomial based on the number of basis functions
+      let degree = if num_basis_functions == 10 {
+        3
+      } else if num_basis_functions == 15 {
+        4
+      } else {
+        panic!("Bad basic functions count");
+      };
+
+      // Calculate values for the current row based on geographic coordinates (latitude/longitude).
+      let lat = raster_params.get_row_y(row_index).unwrap();
+      let d_x = geo::get_degree_lon(lat) * raster_params.resolution[0];
+      let d_y = geo::get_degree_lat(lat) * raster_params.resolution[1];
+
+      // Precompute the basis functions and the matrix M for this row.
+      basis_functions = poly::precompute_basis_functions(degree, d_x, d_y);
+      m = poly::compute_matrix_m(&basis_functions);
+
+    } else {
+      // If global precomputed values are available, use them
+      basis_functions = precomputed_bf.clone();
+      m = precomputed_m.clone();
+    };
     
     for col in 0..raster_params.width {
       // Check if there is a valid elevation value at the current position
@@ -351,17 +385,17 @@ fn main() -> Result<(), Box<dyn Error>> {
           // Get the z values and corresponding indices of the 5x5 neighboring grid around the current pixel
           let (indices, z) = get_neighbors_5x5_indices_and_z(rows, col, raster_params);
           
-          if indices.len() >= precomputed_bf.ncols() + 6 {
+          if indices.len() >= num_basis_functions + 6 {
             // Extract only the relevant rows from the precomputed basis function matrix (based on valid indices)
-            let mut filtered_bf = DMatrix::zeros(indices.len(), precomputed_bf.ncols());
+            let mut filtered_bf = DMatrix::zeros(indices.len(), num_basis_functions);
             for (i, &idx) in indices.iter().enumerate() {
-              filtered_bf.set_row(i, &precomputed_bf.row(idx));
+              filtered_bf.set_row(i, &basis_functions.row(idx));
             }
             
             // Perform polynomial least squares fitting to calculate the derivatives
             let derivatives = if indices.len() == 25 {
               // Use the precomputed matrix M if we have all 25 points
-              poly::poly_lsq_der_with_precomputed(&z, &filtered_bf, &precomputed_m)
+              poly::poly_lsq_der_with_precomputed(&z, &filtered_bf, &m)
             } else {
               // Dynamically compute the matrix M for the filtered basis functions
               let filtered_m = poly::compute_matrix_m(&filtered_bf);
@@ -384,6 +418,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
       }
     }
+
     row_data
   }
   
@@ -392,11 +427,22 @@ fn main() -> Result<(), Box<dyn Error>> {
       
       print!("Calculating Land Surface Parameters...");
       io::stdout().flush().unwrap();
-      
-      let d_x = raster_params.resolution[0];
-      let d_y = raster_params.resolution[1];
-      let basis_functions = Arc::new(poly::precompute_basis_functions(degree, d_x, d_y));
-      let m = Arc::new(poly::compute_matrix_m(&basis_functions));
+
+      let (basis_functions, m) = if !raster_params.is_geographic {
+        // Precalculate values ​​for a non-geographic system (rectangular grid)
+        let d_x = raster_params.resolution[0];
+        let d_y = raster_params.resolution[1];
+
+        let basis_functions = Arc::new(poly::precompute_basis_functions(degree, d_x, d_y));
+        let m = Arc::new(poly::compute_matrix_m(&basis_functions));
+        (basis_functions, m)
+      } else {
+        // Create empty values (degree encoded in bf cols)
+        let num_basis_functions = (degree + 1) * (degree + 2) / 2;
+        let empty_basis_functions = Arc::new(DMatrix::zeros(0, num_basis_functions));
+        let empty_m = Arc::new(DMatrix::zeros(0, 0));
+        (empty_basis_functions, empty_m)
+      };
       
       let grid_arc = Arc::new(grid);
       let height = grid_arc.params().height;
@@ -431,7 +477,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             
             let rows = [prev2_row, prev_row, current_row, next_row, next2_row];
             
-            let row_data = calc_row_lsp(rows, raster_params, &*selected_params_clone, &*basis_functions_clone, &*m_clone);
+            let row_data = calc_row_lsp(rows, row, raster_params, &*selected_params_clone, &*basis_functions_clone, &*m_clone);
             tx.send((row, row_data)).unwrap();
 
             let mut num = count_clone.lock().unwrap();
