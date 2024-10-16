@@ -372,13 +372,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             
             match derivatives {
               Some(derivatives) => {
-                let mut param_values = Vec::with_capacity(selected_params.len());
-                // Calculate values of selected LSPs 
-                for name in selected_params {
-                  let value = lsp::calculate(name, &derivatives);
-                  param_values.push(value);
-                }
-                
+                // Calculate values of selected LSPs
+                let param_values = lsp::calculate(selected_params, &derivatives);
                 row_data.push((col, Some(param_values)));
               }
               None => {

@@ -4,11 +4,12 @@ const DEG: f64 = 180.0 / PI;  // Constant for converting radians to degrees
 
 // Function to calculate land surface parameters based on derivatives
 pub fn calculate(
-  param: &str,                // Name of the parameter to calculate
+  params: &Vec<String>,         // A vector of parameter names to calculate
   derivatives: &Vec<f64>,     // A vector containing the derivative values
-) -> f32 {
+) -> Vec<f32> {
   
-  let value: f64;  // Variable to store the computed value
+  // Initialize a vector to store the results
+  let mut param_values = Vec::with_capacity(params.len());
   
   if derivatives.len() == 10 {
     // Destructure the derivatives for easy access
@@ -16,6 +17,8 @@ pub fn calculate(
       panic!("Bad derivatives data");  
     };
     
+    //TODO check needed calculations
+
     let zx2 = zx * zx;
     let zy2 = zy * zy;
     let zxy2 = zxy * zxy;
@@ -78,137 +81,139 @@ pub fn calculate(
     let knss_denominator = (p3 * p * p).sqrt() * m5.sqrt();
     let knss = knss_numerator / knss_denominator;
 
+    for param in params {
+      let value = match param.as_str() {
+        "slope" => {
+          // Calculate the Slope in degrees
+          slope * DEG
+        },
+        "sin_slope" => {
+          // Use sine of slope
+          sin_slope
+        }
+        "aspect" => {
+          // Calculate the Aspect
+          let angle_deg = angle * DEG;
+          if angle_deg < 0.0 {
+            angle_deg + 360.0
+          } else {
+            angle_deg
+          }
+        },
+        "sin_aspect" => {
+          // Use the Sine of Aspect
+          sin_aspect
+        },
+        "cos_aspect" => {
+          // Use the Cosine of Aspect
+          cos_aspect
+        },
+        "kns" => {
+          // Use the Normal slope line (profile) curvature
+          kns
+        },
+        "zss" => {
+          // Calculate Second slope line derivative
+          kns / (cos_slope2 * cos_slope)
+        },
+        "ts" => {
+          // Calculate Slope line torsion
+          kns / cos_slope
+        },
+        "knc" => {
+          // Use the Normal contour (tangential) curvature
+          knc
+        },
+        "zcc" => {
+          // Calculate Second contour derivative
+          knc / cos_slope
+        },
+        "kpc" => {
+          // Calculate Projected contour curvature
+          knc / sin_slope
+        },
+        "tc" => {
+          // Use the Contour geodesic torsion
+          tc
+        },
+        "kps" => {
+          // Calculate Projected slope line curvature
+          tc / (sin_slope * cos_slope)
+        },
+        "sin_sc" => {
+          // Calculate Contour change of sin slope
+          tc * cos_slope
+        },
+        "el" => {
+          // Calculate Elevation laplacian
+          (knc * cos_slope2 + kns) / (cos_slope2 * cos_slope)
+        },
+        "k_max" => {
+          // Use Maximal curvature
+          k_max
+        },
+        "k_min" => {
+          // Use Minimal curvature
+          k_min
+        },
+        "k_mean" => {
+          // Calculate Mean curvature
+          (kns + knc) / 2.0
+        },
+        "kc" => {
+          // Calculate Casorati curvature
+          ((k_max.powi(2) + k_min2) / 2.0).sqrt()
+        },
+        "kr" => {
+          // Calculate Total ring curvature
+          knc * kns - k_min * (knc + kns) + k_min2
+        },
+        "kd" => {
+          // Calculate Difference curvature
+          (kns - knc) / 2.0
+        },
+        "ka" => {
+          // Calculate Total accumulation curvature
+          kns * knc
+        },
+        "khe" => {
+          // Calculate Horizontal excess curvature
+          knc - k_min
+        },
+        "kve" => {
+          // Calculate Vertical excess curvature
+          kns - k_min
+        },
+        "k" => {
+          // Calculate Gaussian curvature
+          k_max * k_min
+        },
+        "ku" => {
+          // Calculate Unsphericity curvature
+          (k_max - k_min) / 2.0
+        },
+        "kncc" => {
+          // Use Contour change of normal contour curvature
+          kncc
+        },
+        "kncs" => {
+          // Use Slope line change of normal contour curvature
+          kncs
+        },
+        "knss" => {
+          // Use Slope line change of normal slope line curvature
+          knss
+        },
+        _ => panic!("Parameter calculation for {} is not implemented!", param),
+      };
 
-
-    // Match to determine the parameter to calculate
-    match param {
-      "slope" => {
-        // Calculate the Slope in degrees
-        value = slope * DEG;
-      },
-      "sin_slope" => {
-        // Use sine of slope
-        value = sin_slope;
-      }
-      "aspect" => {
-        // Calculate the Aspect
-        let angle_deg = angle * DEG;
-        value = if angle_deg < 0.0 {
-          angle_deg + 360.0
-        } else {
-          angle_deg
-        };
-      },
-      "sin_aspect" => {
-        // Use the Sine of Aspect
-        value = sin_aspect;
-      },
-      "cos_aspect" => {
-        // Use the Cosine of Aspect
-        value = cos_aspect;
-      },
-      "kns" => {
-        // Use the Normal slope line (profile) curvature
-        value = kns;
-      },
-      "zss" => {
-        // Calculate Second slope line derivative
-        value = kns / (cos_slope2 * cos_slope);
-      },
-      "ts" => {
-        // Calculate Slope line torsion
-        value = kns / cos_slope;
-      },
-      "knc" => {
-        // Use the Normal contour (tangential) curvature
-        value = knc;
-      },
-      "zcc" => {
-        // Calculate Second contour derivative
-        value = knc / cos_slope;
-      },
-      "kpc" => {
-        // Calculate Projected contour curvature
-        value = knc / sin_slope;
-      },
-      "tc" => {
-        // Use the Contour geodesic torsion
-        value = tc;
-      },
-      "kps" => {
-        // Calculate Projected slope line curvature
-        value = tc / (sin_slope * cos_slope);
-      },
-      "sin_sc" => {
-        // Calculate Contour change of sin slope
-        value = tc * cos_slope;
-      },
-      "el" => {
-        // Calculate Elevation laplacian
-        value = (knc * cos_slope2 + kns) / (cos_slope2 * cos_slope);
-      },
-      "k_max" => {
-        // Use Maximal curvature
-        value = k_max;
-      },
-      "k_min" => {
-        // Use Minimal curvature
-        value = k_min;
-      },
-      "k_mean" => {
-        // Calculate Mean curvature
-        value = (kns + knc) / 2.0;
-      },
-      "kc" => {
-        // Calculate Casorati curvature
-        value = ((k_max.powi(2) + k_min2) / 2.0).sqrt();
-      },
-      "kr" => {
-        // Calculate Total ring curvature
-        value = knc * kns - k_min * (knc + kns) + k_min2;
-      },
-      "kd" => {
-        // Calculate Difference curvature
-        value = (kns - knc) / 2.0;
-      },
-      "ka" => {
-        // Calculate Total accumulation curvature
-        value = kns * knc;
-      },
-      "khe" => {
-        // Calculate Horizontal excess curvature
-        value = knc - k_min;
-      },
-      "kve" => {
-        // Calculate Vertical excess curvature
-        value = kns - k_min;
-      },
-      "k" => {
-        // Calculate Gaussian curvature
-        value = k_max * k_min;
-      },
-      "ku" => {
-        // Calculate Unsphericity curvature
-        value = (k_max - k_min) / 2.0;
-      },
-      "kncc" => {
-        // Use Contour change of normal contour curvature
-        value = kncc;
-      },
-      "kncs" => {
-        // Use Slope line change of normal contour curvature
-        value = kncs;
-      },
-      "knss" => {
-        // Use Slope line change of normal slope line curvature
-        value = knss;
-      },
-      _ => panic!("Parameter calculation for {} is not implemented!", param),  
+      param_values.push(value as f32);
     }
+
   } else {
     panic!("Bad derivatives length");  
   }
   
-  value as f32 
+  param_values
 }
 
