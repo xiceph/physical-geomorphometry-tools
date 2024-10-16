@@ -16,6 +16,7 @@ pub struct RasterParams {
   pub height: usize,
   pub origin: [f64; 2],
   pub resolution: [f64; 2],
+  pub is_geographic: bool,
   pub nodata: f64,
 }
 
@@ -23,6 +24,16 @@ impl RasterParams {
   // Method to check if a value is a NoData value
   pub fn is_nodata(&self, value: f64) -> bool {
     value == self.nodata
+  }
+
+  // Get a y coordinate
+  pub fn get_row_y(&self, row_index: usize) -> Option<f64> {
+    if row_index < self.height {
+      let y = self.origin[1] + (row_index as f64 + 0.5) * self.resolution[1];
+      Some(y)
+    } else {
+      None
+    }
   }
 }
 

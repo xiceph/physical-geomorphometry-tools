@@ -12,11 +12,11 @@ pub fn precompute_basis_functions(degree: usize, d_x: f64, d_y: f64) -> DMatrix<
   // Initialize the basis functions matrix with zeros (size: 25 x num_basis_functions)
   let mut basis_functions = DMatrix::zeros(num_points, num_basis_functions);
   
-  // Loop through grid coordinates for x and y
-  for (i, &x) in grid_coords_x.iter().enumerate() {
-    for (j, &y) in grid_coords_y.iter().enumerate() {
-      let idx = i * 5 + j;  // Index for the point in the grid
-      
+  // Loop through grid coordinates for y and x
+  for (y_idx, &y) in grid_coords_y.iter().enumerate() {
+    for (x_idx, &x) in grid_coords_x.iter().enumerate() {
+      let idx = y_idx * 5 + x_idx;  // Index for the point in the grid
+
       // Compute basis functions based on polynomial degree
       let mut func_idx = 0;
       for sum in 0..=degree {
