@@ -366,8 +366,6 @@ fn main() -> Result<(), Box<dyn Error>> {
       let d_x = geo::get_degree_lon(lat) * raster_params.resolution[0];
       let d_y = geo::get_degree_lat(lat) * raster_params.resolution[1];
 
-      println!("{} -> dx: {}, dy: {}", row_index, d_x, d_y);
-
       // Precompute the basis functions and the matrix M for this row.
       basis_functions = poly::precompute_basis_functions(degree, d_x, d_y);
       m = poly::compute_matrix_m(&basis_functions);
