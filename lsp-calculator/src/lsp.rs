@@ -43,7 +43,7 @@ pub fn calculate(
     let cos_slope = slope.cos();
     let cos_slope2 = cos_slope * cos_slope;
 
-    let angle = (zy).atan2(*zx);
+    let angle = (-zx).atan2(-*zy);
     let sin_aspect = angle.sin();
     let cos_aspect = angle.cos();
 
