@@ -26,7 +26,7 @@ The sine of the slope _S_ quantifies the potential gravitational energy per unit
 Aspect is the orientation of a slope (in the direction of descent), which indicates the direction of gravitational flows. It is the horizontal angle that depends on the orientation of the axes, traditionally measured clockwise from north. When using the easting-northing axes, the equation is (using the `atan2` function to determine the correct quadrant of the angle):
 
 ```math
-A = \text{atan2}(z_y, z_x)
+A = \text{atan2}(-z_x, -z_y)
 ```
 
 Due to the circular nature of aspect data, sine and cosine of the aspect are sometimes used for analysis (e.g., segmentation).
