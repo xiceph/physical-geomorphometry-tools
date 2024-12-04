@@ -1,5 +1,6 @@
-use gdal::raster::{RasterBand, RasterCreationOption};
+use gdal::raster::{RasterBand};
 use gdal::{Dataset, DriverManager};
+use gdal::cpl::{CslStringList};
 use clap::{Command, Arg, ArgAction};
 use std::time::Instant;
 use std::error::Error;
@@ -535,31 +536,18 @@ fn main() -> Result<(), Box<dyn Error>> {
         let grid = &param_grids[index];
         let result = (*grid).to_gdal_buffer();
         match result {
-          Ok(buffer) => {
+          Ok(mut buffer) => {
             // output
             let driver = DriverManager::get_driver_by_name("GTiff").unwrap();
-            let options = [
-              RasterCreationOption {
-                key: "TILED",
-                value: "YES"
-              },
-              RasterCreationOption {
-                key: "BLOCKXSIZE",
-                value: "16"
-              },
-              RasterCreationOption {
-                key: "BLOCKYSIZE",
-                value: "16"
-              }
-            ];
+            let options = CslStringList::from_iter(["TILED=YES", "BLOCKXSIZE=16", "BLOCKYSIZE=16"]);
             
             let file_name = format!("{}_{}.tif", output_prefix, name);
             
             let mut ds = driver
             .create_with_band_type_with_options::<f32, _>(
               &file_name,
-              width as isize,
-              height as isize,
+              width,
+              height,
               1,
               &options,
             ).expect("Failed to create GeoTIFF file.");
@@ -569,7 +557,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             
             let mut band1 = ds.rasterband(1).unwrap();
             band1.set_no_data_value(no_data)?;
-            band1.write((0, 0), (width as usize, height as usize), &buffer).expect("Failed to write data");
+            band1.write((0, 0), (width as usize, height as usize), &mut buffer).expect("Failed to write data");
             band1.compute_raster_min_max(true)?;
           }
           Err(err) => {

@@ -104,7 +104,7 @@ impl Grid<f32> {
       let mut row_data = Vec::with_capacity(params.width);
       for col in 0..params.width {
         let index = (row * params.width + col) as usize;
-        row_data.push(data.data[index]);
+        row_data.push(data.data()[index]);
       }
       grid_data.push(row_data);
     }
