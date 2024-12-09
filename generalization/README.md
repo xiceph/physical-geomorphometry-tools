@@ -1,3 +1,98 @@
-# Land Surface Generalization Tool
+# QEM Generalize – Land Surface Generalization Tool
 
-coming soon
+## Overview
+
+`QEM Generalize` is a tool for generating a **generalized raster** from an elevation raster (DEM - Digital Elevation Model) using the **Quadric Error Metric (QEM)**. This process progressively simplifies the land surface shape while preserving key land surface features. The tool aims to enhance support for digital geomorphological mapping, but it can also be useful for a broader range of geoscientific research.
+
+This tool is part of the larger **physical-geomorphometry** project, which provides physically based methods for analyzing landforms and land surface dynamics. `QEM Generalize` complements other tools in the project by offering efficient raster generalization technique.
+
+## Features
+
+- **Quadric Error Metric-based Generalization**:
+  - Uses QEM to simplify elevation rasters.
+- **Adjustable Parameters**:
+  - Control the number of iterations, resolution reduction factor, and sharpness.
+- **Multithreading Support**:
+  - Utilize multiple CPU cores for faster computation.
+- **Customizable Outputs**:
+  - Specify input and output file paths, and fine-tune generalization parameters.
+
+## Usage
+
+### Command-Line Arguments
+
+| Argument              | Short | Description                                                                              | Default Value |
+|-----------------------|-------|------------------------------------------------------------------------------------------|---------------|
+| `--input-file`        | `-i`  | Specify the input raster file path (required).                                           | N/A           |
+| `--output-file`       | `-o`  | Specify the output raster file path (required).                                          | N/A           |
+| `--iterations`        | `-n`  | Number of iterations for generalization.                                                 | `10`          |
+| `--reduction`         | `-r`  | Resolution reduction factor (≥ 1.0).                                                     | `1.0`         |
+| `--sharpness`         | `-s`  | Sharpness level for edge retention (1-9).                                                | `5`           |
+| `--jobs`              | `-j`  | Number of threads to use (if omitted, all available processors are used).                | All available |
+
+### Example Usage
+
+#### Generalize with default settings:
+```bash
+qem_generalize -i dem.tif -o output.tif
+```
+
+#### Specify custom iterations, reduction, and sharpness:
+```bash
+qem_generalize -i dem.tif -o output.tif -n 50 -r 2.0 -s 7
+```
+
+#### Limit the number of threads used:
+```bash
+qem_generalize -i dem.tif -o output.tif -j 4
+```
+
+### Output
+
+The tool generates a single output raster file, specified by the `--output-file` argument. The output raster reflects the generalized land surface based on the selected parameters.
+
+## How it Works
+
+1. **Raster Input**:
+   - Reads the input raster (DEM) and validates its format.
+2. **Generalization**:
+   - Applies the Quadric Error Metric (QEM) to simplify the raster:
+     - **Iterations**: Controls the depth of simplification.
+     - **Reduction Factor**: Defines the extent of resolution reduction.
+     - **Sharpness**: Influences the retention of sharp land surface features.
+3. **Parallel Processing**:
+   - Automatically distributes workload across available CPU cores (configurable).
+4. **Output**:
+   - Writes the generalized raster to the specified file path.
+
+## Installation
+
+To use this tool, you'll need to build it from the source code. Follow these steps:
+
+### Prerequisites
+
+- **Rust**: Install a Rust development environment to compile the source code.
+- **GDAL**: Ensure GDAL is installed to handle raster data.
+
+### Building
+
+Clone the repository and compile the tool:
+```bash
+git clone https://github.com/xiceph/physical-geomorphometry-tools.git
+cd physical-geomorphometry-tools/generalization/
+cargo build --release
+```
+
+The compiled binary will be located in the `target/release` directory.
+
+### Running the Tool
+
+After building, you can run the tool as demonstrated in the usage examples.
+
+## Future Plans
+
+To simplify standalone binary creation, we plan to investigate reducing or eliminating GDAL dependence. This will make the tool more accessible and easier to use.
+
+## License
+
+This project is licensed under the MIT License.
