@@ -1,10 +1,10 @@
-# QEM Generalize – Land Surface Generalization Tool
+# QEM Generalization – Land Surface Generalization Tool
 
 ## Overview
 
-`QEM Generalize` is a tool for generating a **generalized raster** from an elevation raster (DEM - Digital Elevation Model) using the **Quadric Error Metric (QEM)**. This process progressively simplifies the land surface shape while preserving key land surface features. The tool aims to enhance support for digital geomorphological mapping, but it can also be useful for a broader range of geoscientific research.
+`QEM Generalization` is a tool for generating a **generalized raster** from an elevation raster (DEM - Digital Elevation Model) using the **Quadric Error Metric (QEM)**. This process progressively simplifies the land surface shape while preserving key land surface features. The tool aims to enhance support for digital geomorphological mapping, but it can also be useful for a broader range of geoscientific research.
 
-This tool is part of the larger **physical-geomorphometry** project, which provides physically based methods for analyzing landforms and land surface dynamics. `QEM Generalize` complements other tools in the project by offering efficient raster generalization technique.
+This tool is part of the larger **physical-geomorphometry** project, which provides physically based methods for analyzing landforms and land surface dynamics. `QEM Generalization` complements other tools in the project by offering efficient raster generalization technique.
 
 ## Features
 
@@ -34,17 +34,17 @@ This tool is part of the larger **physical-geomorphometry** project, which provi
 
 #### Generalize with default settings:
 ```bash
-qem_generalize -i dem.tif -o output.tif
+qem_generalization -i dem.tif -o output.tif
 ```
 
 #### Specify custom iterations, reduction, and sharpness:
 ```bash
-qem_generalize -i dem.tif -o output.tif -n 50 -r 2.0 -s 7
+qem_generalization -i dem.tif -o output.tif -n 50 -r 2.0 -s 7
 ```
 
 #### Limit the number of threads used:
 ```bash
-qem_generalize -i dem.tif -o output.tif -j 4
+qem_generalization -i dem.tif -o output.tif -j 4
 ```
 
 ### Output

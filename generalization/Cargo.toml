@@ -1,5 +1,5 @@
 [package]
-name = "qem_generalize"
+name = "qem_generalization"
 description = "Tool for calculating Land Surface Parameters from an elevation raster."
 readme = "README.md"
 version = "1.0.0"
