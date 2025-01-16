@@ -72,7 +72,7 @@ The tool leverages polynomial approximations to derive various local LSPs, such 
 ### Command-Line Arguments
 
 ```bash
-lsp-calculator [OPTIONS]
+lsp_calculator [OPTIONS]
 ```
 
 ### Required Arguments
@@ -137,13 +137,13 @@ You can choose one or more specific parameters to calculate using the following 
 #### Calculate all available parameters
 
 ```bash
-lsp-calculator -i dem.tif -o output -a
+lsp_calculator -i dem.tif -o output -a
 ```
 
 #### Calculate specific parameters (e.g., slope and aspect)
 
 ```bash
-lsp-calculator -i dem.tif -o output --slope --aspect
+lsp_calculator -i dem.tif -o output --slope --aspect
 ```
 
 ### Output
