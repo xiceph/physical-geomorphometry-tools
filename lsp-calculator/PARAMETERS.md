@@ -62,7 +62,7 @@ Change of sine of slope (flow energy) in direction of slope line. Expression of 
 Divergence of slope lines multiplied by sine of slope. Expression of the energy of flow concentration.
 
 ```math
-(k_n)_c = -\frac{z_{xx} z_y^2 + 2z_{xy} z_x z_y + z_{yy} z_x^2}{(z_x^2 + z_y^2) \sqrt{1 + z_x^2 + z_y^2}}
+(k_n)_c = -\frac{z_{xx} z_y^2 - 2z_{xy} z_x z_y + z_{yy} z_x^2}{(z_x^2 + z_y^2) \sqrt{1 + z_x^2 + z_y^2}}
 ```
 
 ### Contour torsion – _𝜏<sub>c</sub>_
