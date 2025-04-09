@@ -146,15 +146,15 @@ Instead, it calculates and outputs the following partial derivatives derived fro
 **Outputs include:**
 
 - `z_fit` – Interpolated elevation z from fitted polynomial
-- `zx` – First-order derivative ∂z/∂x
-- `zy` – First-order derivative ∂z/∂y
-- `zxx` – Second-order derivative ∂²z/∂x²
-- `zxy` – Second-order mixed derivative ∂²z/∂x∂y
-- `zyy` – Second-order derivative ∂²z/∂y²
-- `zxxx` – Third-order derivative ∂³z/∂x³
-- `zxxy` – Third-order mixed derivative ∂³z/∂x²∂y
-- `zxyy` – Third-order mixed derivative ∂³z/∂x∂y²
-- `zyyy` – Third-order derivative ∂³z/∂y³
+- `zx` – First-order derivative \(\frac{\partial z}{\partial x}\)
+- `zy` – First-order derivative \(\frac{\partial z}{\partial y}\)
+- `zxx` – Second-order derivative \(\frac{\partial^2 z}{\partial x^2}\)
+- `zxy` – Second-order mixed derivative \(\frac{\partial^2 z}{\partial x \partial y}\)
+- `zyy` – Second-order derivative \(\frac{\partial^2 z}{\partial y^2}\)
+- `zxxx` – Third-order derivative \(\frac{\partial^3 z}{\partial x^3}\)
+- `zxxy` – Third-order mixed derivative \(\frac{\partial^3 z}{\partial x^2 \partial y}\)
+- `zxyy` – Third-order mixed derivative \(\frac{\partial^3 z}{\partial x \partial y^2}\)
+- `zyyy` – Third-order derivative \(\frac{\partial^3 z}{\partial y^3}\)
 
 > **Note:** This mode overrides any other parameter selection flags (`--all`, `--slope`, etc.). Only the partial derivatives and interpolated elevation will be computed and saved.
 
