@@ -57,6 +57,9 @@ The tool leverages polynomial approximations to derive various local LSPs, such 
 
   _For more detailed information on each parameter, please refer to the [LSPs description page](./PARAMETERS.md)._
 
+- **Partial Derivatives Calculations**:
+  - Can output partial derivatives (and interpolated elevation) instead of LSPs.
+
 - **Input and Output**:
   - Supports input from a GeoTIFF raster file.
   - Outputs parameter-specific GeoTIFF files based on selected computations.
@@ -132,6 +135,29 @@ You can choose one or more specific parameters to calculate using the following 
 - `--kncs`: Slope line change of normal contour curvature
 - `--knss`: Slope line change of normal slope line curvature
 
+### Output of Partial Derivatives Only
+
+- `-p, --partials`
+
+When this flag is provided, the tool does **not** compute or output any Land Surface Parameters (LSPs), regardless of other parameter selection options.
+
+Instead, it calculates and outputs the following partial derivatives derived from the local polynomial surface fitted to each raster cell (up to the third order), along with the interpolated elevation value _z_ from the fitted polynomial. These outputs are useful for custom analyses or when developing new terrain metrics.
+
+**Outputs include:**
+
+- `z_fit` – Interpolated elevation z from fitted polynomial
+- `zx` – First-order derivative ∂z/∂x
+- `zy` – First-order derivative ∂z/∂y
+- `zxx` – Second-order derivative ∂²z/∂x²
+- `zxy` – Second-order mixed derivative ∂²z/∂x∂y
+- `zyy` – Second-order derivative ∂²z/∂y²
+- `zxxx` – Third-order derivative ∂³z/∂x³
+- `zxxy` – Third-order mixed derivative ∂³z/∂x²∂y
+- `zxyy` – Third-order mixed derivative ∂³z/∂x∂y²
+- `zyyy` – Third-order derivative ∂³z/∂y³
+
+> **Note:** This mode overrides any other parameter selection flags (`--all`, `--slope`, etc.). Only the partial derivatives and interpolated elevation will be computed and saved.
+
 ### Example Usage
 
 #### Calculate all available parameters
@@ -144,6 +170,12 @@ lsp_calculator -i dem.tif -o output -a
 
 ```bash
 lsp_calculator -i dem.tif -o output --slope --aspect
+```
+
+#### Calculate partial derivatives instead of LSPs
+
+```bash
+lsp_calculator -i dem.tif -o output --partials
 ```
 
 ### Output
@@ -165,7 +197,7 @@ For example, when calculating slope and aspect, the following files are produced
    - The degree of the polynomial can be configured to either 3 or 4.
 
 3. **Land Surface Parameter Calculation**:
-   - Based on the polynomial surface, various land surface parameters are calculated.
+   - Based on the polynomial surface, partial derivatives are calculated, and from these, various land surface parameters (LSPs) are determined..
    - Calculations are performed in parallel using multiple CPU cores to improve performance.
 
 4. **Output**:

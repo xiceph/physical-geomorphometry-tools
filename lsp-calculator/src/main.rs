@@ -74,16 +74,30 @@ fn main() -> Result<(), Box<dyn Error>> {
     ("kncc", "Contour change of normal contour curvature"),
     ("kncs", "Slope line change of normal contour curvature"),
   ];
-  //let total_parameters = parameters.len();
+
+  let partials = vec![
+    // Partial derivatives and polynomial interpolation
+    ("z_fit", "Interpolated elevation z from fitted polynomial"),
+    ("zx", "First-order derivative ∂z/∂x"),
+    ("zy", "First-order derivative ∂z/∂y"),
+    ("zxx", "Second-order derivative ∂²z/∂x²"),
+    ("zxy", "Second-order mixed derivative ∂²z/∂x∂y"),
+    ("zyy", "Second-order derivative ∂²z/∂y²"),
+    ("zxxx", "Third-order derivative ∂³z/∂x³"),
+    ("zxxy", "Third-order mixed derivative ∂³z/∂x²∂y"),
+    ("zxyy", "Third-order mixed derivative ∂³z/∂x∂y²"),
+    ("zyyy", "Third-order derivative ∂³z/∂y³"),
+  ];
 
   let group_first = vec!["slope", "aspect", "sin_slope", "sin_aspect", "cos_aspect"];
   let group_second = vec!["kns", "knc", "tc", "zss", "ts", "zcc", "kpc", "kps", "sin_sc", "kd", "ka", "kr", "khe", "kve", "k_max", "k_min", "k", "el", "ku", "k_mean", "kc"];
   let group_third = vec!["knss", "kncc", "kncs"];
   let group_segmentation = vec!["sin_slope", "sin_aspect", "cos_aspect", "kns", "knc", "tc", "knss", "kncc", "kncs"];
+  let group_partials = vec![ "z_fit", "zx", "zy", "zxx", "zxy", "zyy", "zxxx", "zxxy", "zxyy", "zyyy" ];
   
   let mut app = Command::new("Land Surface Parameters Calculator")
   .version(env!("CARGO_PKG_VERSION"))
-  .author("Richard Feciskanin <richard.feciskanin@uniba.sk>\nVeronika Hajdúchová <hajduchova18@uniba.sk>")
+  .author("Richard Feciskanin <richard.feciskanin@uniba.sk>\nVeronika Hajdúchová <veronika.hajduchova@uniba.sk>")
   //.about("The program calculates Land Surface Parameters for an elevation raster.")
   .after_help(&format!("{}\n  \
     {}{}Compute all Land Surface Parameters offered by the tool (listed below)\n  \
@@ -130,6 +144,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     .short('j')
     .long("jobs")
     .help("Specify the number of threads to use (if omitted, all available processors are used)"),
+  )
+  .arg(
+    Arg::new("partials")
+    .short('p')
+    .long("partials")
+    .help("Output only partial derivatives and fitted elevation; disables all LSP outputs")
+    .action(ArgAction::SetTrue),
   )
   .arg(
     Arg::new("all")
@@ -226,6 +247,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     num_procs
   };
 
+  let partials_only = matches.get_flag("partials");
+
   let all = matches.get_flag("all");
 
   let mut selected_params_set: HashSet<String> = HashSet::new();
@@ -250,18 +273,43 @@ fn main() -> Result<(), Box<dyn Error>> {
   }
   let total_selected = selected_params_set.len();
 
+  if total_selected == 0 && !partials_only {
+    let output = format!(
+      "{}: No output selected. Please select at least one parameter to calculate.",
+      text::error("Error".to_string())
+    );
+    eprintln!("{}\n", text::bold(output));
+    std::process::exit(1);
+  }
+
+
   println!("Starting calculation using a degree {} polynomial approximation.\n", degree);
-  println!("The following parameters will be calculated [{}]:", total_selected);
-  println!("{}", line);
-  
-  for (name, title) in &parameters {
-    if selected_params_set.contains(&name.to_string()) {
+
+  if partials_only {
+    println!("The following partial derivatives will be calculated [10]:");
+    println!("{}", line);
+
+    for (name, title) in &partials {
       println!("{}\n  {}", title, text::light(format!("└─▶ {}_{}.tif", output_prefix, name)));
     }
+  } else {
+    println!("The following parameters will be calculated [{}]:", total_selected);
+    println!("{}", line);
+
+    for (name, title) in &parameters {
+      if selected_params_set.contains(&name.to_string()) {
+        println!("{}\n  {}", title, text::light(format!("└─▶ {}_{}.tif", output_prefix, name)));
+      }
+    }
   }
+
   println!("{}\n", dline);
   
-  let selected_params: Vec<String> = selected_params_set.into_iter().collect();
+  let selected_params: Vec<String> = if partials_only {
+    group_partials.iter().map(|s| s.to_string()).collect()
+  } else {
+    selected_params_set.into_iter().collect()
+  };
 
   let mut part_time = Instant::now();
   
@@ -407,9 +455,12 @@ fn main() -> Result<(), Box<dyn Error>> {
             
             match derivatives {
               Some(derivatives) => {
-                // Calculate values of selected LSPs
-                let param_values = lsp::calculate(selected_params, &derivatives);
-                row_data.push((col, Some(param_values)));
+                if selected_params.len() == 10 && selected_params[0] == "z_fit" { // Return values of partial derivatives
+                  row_data.push((col, Some(derivatives.iter().map(|v| *v as f32).collect())));
+                } else { // Calculate values of selected LSPs
+                  let param_values = lsp::calculate(selected_params, &derivatives);
+                  row_data.push((col, Some(param_values)));
+                }
               }
               None => {
                 row_data.push((col, None));
