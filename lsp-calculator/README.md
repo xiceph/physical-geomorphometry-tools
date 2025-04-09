@@ -141,7 +141,7 @@ You can choose one or more specific parameters to calculate using the following 
 
 When this flag is provided, the tool does **not** compute or output any Land Surface Parameters (LSPs), regardless of other parameter selection options.
 
-Instead, it calculates and outputs the following partial derivatives derived from the local polynomial surface fitted to each raster cell (up to the third order), along with the interpolated elevation value _z_ from the fitted polynomial. These outputs are useful for custom analyses or when developing new terrain metrics.
+Instead, it calculates and outputs the following partial derivatives derived from the local polynomial surface fitted to each raster cell (up to the third order), along with the interpolated elevation value _z_ from the fitted polynomial. These outputs are useful for custom calculations of land surface characteristics.
 
 **Outputs include:**
 
