@@ -125,7 +125,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!(
           "{}: 'iterations' value is high ({}) and not using resolution reduction. Consider using resolution reduction for faster calculation.\n",
           text::warning("Warning".to_string()),
-          value
+          iterations
         );
       }
       value
