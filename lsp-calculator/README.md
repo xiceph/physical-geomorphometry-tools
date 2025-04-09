@@ -146,7 +146,7 @@ Instead, it calculates and outputs the following partial derivatives derived fro
 **Outputs include:**
 
 - `z_fit` – Interpolated elevation z from fitted polynomial
-- `zx` – First-order derivative \(\frac{\partial z}{\partial x}\)
+- `zx` – First-order derivative \frac{\partial z}{\partial x}
 - `zy` – First-order derivative \(\frac{\partial z}{\partial y}\)
 - `zxx` – Second-order derivative \(\frac{\partial^2 z}{\partial x^2}\)
 - `zxy` – Second-order mixed derivative \(\frac{\partial^2 z}{\partial x \partial y}\)
