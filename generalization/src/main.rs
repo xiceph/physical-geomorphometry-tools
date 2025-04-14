@@ -609,7 +609,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
            // Write the buffer data to the raster band
           let mut band1 = ds.rasterband(1).unwrap();
-          band1.set_no_data_value(no_data)?;
+          band1.set_no_data_value(Some(raster_params.nodata))?;
           band1.write((0, 0), (width_red, height_red), &mut buffer).expect("Failed to write data");
           band1.compute_raster_min_max(true)?;
         }
