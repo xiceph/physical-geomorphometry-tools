@@ -607,7 +607,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             ds.set_geo_transform(&geotransform).expect("Failed to set geotransform");
             
             let mut band1 = ds.rasterband(1).unwrap();
-            band1.set_no_data_value(no_data)?;
+            band1.set_no_data_value(Some(raster_params.nodata))?;
             band1.write((0, 0), (width as usize, height as usize), &mut buffer).expect("Failed to write data");
             band1.compute_raster_min_max(true)?;
           }
