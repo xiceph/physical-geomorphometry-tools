@@ -1,34 +1,41 @@
-pub fn bold(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[1m");
-    format!("\x1b[1m{}\x1b[0m", modified_text)
+use console::style;
+
+pub fn bold<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).bold().to_string()
 }
 
-pub fn underline(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[4m");
-    format!("\x1b[4m{}\x1b[0m", modified_text)
+pub fn underline<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).underlined().to_string()
 }
 
-pub fn error(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[31m");
-    format!("\x1b[31m{}\x1b[0m", modified_text)
+pub fn error<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).red().to_string()
 }
 
-pub fn warning(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[35;93m");
-    format!("\x1b[35;93m{}\x1b[0m", modified_text)
+pub fn warning<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).color256(214).bold().to_string()
 }
 
-pub fn success(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[92m");
-    format!("\x1b[92m{}\x1b[0m", modified_text)
+pub fn success<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).green().to_string()
 }
 
-pub fn highlight(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[94m");
-    format!("\x1b[94m{}\x1b[0m", modified_text)
+pub fn highlight<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).blue().bold().to_string()
 }
 
-pub fn light(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[90m");
-    format!("\x1b[90m{}\x1b[0m", modified_text)
+pub fn light<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).color256(245).to_string()
 }
+
+#[cfg(windows)]
+pub const ARROW: &str = ">";
+
+#[cfg(not(windows))]
+pub const ARROW: &str = "▶";
+
+#[cfg(windows)]
+pub const CHECK: &str = "v";
+
+#[cfg(not(windows))]
+pub const CHECK: &str = "✓";

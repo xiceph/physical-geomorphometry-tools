@@ -10,6 +10,7 @@ use std::thread;
 use std::collections::HashSet;
 use num_cpus;
 use nalgebra::DMatrix;
+use console::Term;
 
 mod poly;
 mod lsp;
@@ -107,13 +108,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     {}{}Second-order Land Surface Parameters\n  \
     {}{}Land Surface Parameters for Land Surface Segmentation\n\n\
     {}\n{}",
-    text::bold(format!("{} of calculated parameters:", text::underline("Batch selection".to_string()))),
-    text::bold("--all".to_string()), " ".repeat(25),
-    text::bold("--first".to_string()), " ".repeat(23),
-    text::bold("--second".to_string()), " ".repeat(22),
-    text::bold("--third".to_string()), " ".repeat(23),
-    text::bold("--for_segmentation".to_string()), " ".repeat(12),
-    text::bold(format!("{} of calculated parameters (choose one or more specific parameters):", text::underline("Individual selection".to_string()))),
+    text::bold(format!("{} of calculated parameters:", text::underline("Batch selection"))),
+    text::bold("--all"), " ".repeat(25),
+    text::bold("--first"), " ".repeat(23),
+    text::bold("--second"), " ".repeat(22),
+    text::bold("--third"), " ".repeat(23),
+    text::bold("--for_segmentation"), " ".repeat(12),
+    text::bold(format!("{} of calculated parameters (choose one or more specific parameters):", text::underline("Individual selection"))),
     generate_individual_params_help(&parameters)
   ))
   .arg(
@@ -211,9 +212,9 @@ fn main() -> Result<(), Box<dyn Error>> {
   Part of a {} project.\n\n\
   Authors:\n{}\n\
   {}\n",
-  text::highlight(format!("{} {}", text::bold("Land Surface Parameters Calculator".to_string()), app.get_version().unwrap())),
+  format!("{} {}", text::highlight("Land Surface Parameters Calculator"), app.get_version().unwrap()),
   line,
-  text::highlight("physical-geomorphometry".to_string()),
+  text::highlight("physical-geomorphometry"),
   app.get_author().unwrap(),
   dline);
 
@@ -234,11 +235,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     match jobs_str.parse::<usize>() {
       Ok(max_jobs) if max_jobs > 0 => std::cmp::min(max_jobs, num_procs), // If valid and > 0, use the smaller value
       Ok(_) => {
-        println!("{}: 'jobs' value must be greater than 0. Using the number of processors.\n", text::warning("Warning".to_string()));
+        println!("{}: 'jobs' value must be greater than 0. Using the number of processors.\n", text::warning("Warning"));
         num_procs
       },
       Err(_) => {
-        println!("{}: 'jobs' value is not a valid number. Using the number of processors.\n", text::warning("Warning".to_string()));
+        println!("{}: 'jobs' value is not a valid number. Using the number of processors.\n", text::warning("Warning"));
         num_procs
       }
     }
@@ -276,7 +277,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   if total_selected == 0 && !partials_only {
     let output = format!(
       "{}: No output selected. Please select at least one parameter to calculate.",
-      text::error("Error".to_string())
+      text::error("Error")
     );
     eprintln!("{}\n", text::bold(output));
     std::process::exit(1);
@@ -290,7 +291,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("{}", line);
 
     for (name, title) in &partials {
-      println!("{}\n  {}", title, text::light(format!("└─▶ {}_{}.tif", output_prefix, name)));
+      println!("{}\n  {}", title, text::light(format!("└─{} {}_{}.tif", text::ARROW, output_prefix, name)));
     }
   } else {
     println!("The following parameters will be calculated [{}]:", total_selected);
@@ -298,7 +299,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     for (name, title) in &parameters {
       if selected_params_set.contains(&name.to_string()) {
-        println!("{}\n  {}", title, text::light(format!("└─▶ {}_{}.tif", output_prefix, name)));
+        println!("{}\n  {}", title, text::light(format!("└─{} {}_{}.tif", text::ARROW, output_prefix, name)));
       }
     }
   }
@@ -316,7 +317,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   // Open the input raster file
   let dataset = Dataset::open(input_file)
   .unwrap_or_else(|_| {
-    let output = format!("{}: Failed to open input file: {}", text::error("Error".to_string()), input_file);
+    let output = format!("{}: Failed to open input file: {}", text::error("Error"), input_file);
     eprintln!("{}\n", text::bold(output));
     std::process::exit(1);
   });
@@ -346,7 +347,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   let elevation = raster::Grid::<f32>::from_raster_band(raster_params, &rasterband);
   
   let elapsed_time1 = part_time.elapsed();
-  println!("{} Input raster ({} x {}) read in {:.2} seconds.", text::success("✓".to_string()), width, height, elapsed_time1.as_secs_f64());
+  println!("{} Input raster ({} x {}) read in {:.2} seconds.", text::success(text::CHECK), width, height, elapsed_time1.as_secs_f64());
   part_time = Instant::now();
   
   // Retrieves the 5x5 neighborhood around the specified row and column index,
@@ -534,7 +535,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let mut num = count_clone.lock().unwrap();
             *num += 1;
-            print!("\r{}Calculating Land Surface Parameters... {:.0}%", "\x1B[K", *num as f32/height as f32 * 100.0);
+
+            let term = Term::stdout();
+            term.clear_line().unwrap();
+            print!("\rCalculating Land Surface Parameters... {:.0}%", *num as f32 / height as f32 * 100.0);
             io::stdout().flush().unwrap();
           }
         });
@@ -576,7 +580,7 @@ fn main() -> Result<(), Box<dyn Error>> {
       }
       
       let elapsed_time = part_time.elapsed();
-      println!("\r\x1B[K{} Land Surface Parameters calculated in {:.2} seconds.", text::success("✓".to_string()), elapsed_time.as_secs_f64());
+      println!("\r\x1B[K{} Land Surface Parameters calculated in {:.2} seconds.", text::success(text::CHECK), elapsed_time.as_secs_f64());
       part_time = Instant::now();
       
       // For each selected parameter, create an output GeoTIFF file.
@@ -617,7 +621,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
       }
       let elapsed_time = part_time.elapsed();
-      println!("{} Output files written in {:.2} seconds.", text::success("✓".to_string()), elapsed_time.as_secs_f64());
+      println!("{} Output files written in {:.2} seconds.", text::success(text::CHECK), elapsed_time.as_secs_f64());
     }
     Err(err) => {
       println!("Chyba: {}", err);
@@ -626,7 +630,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   
   let elapsed_time = start_time.elapsed();
   println!("{}", line);
-  println!("{}", text::success("Calculations completed successfully.".to_string()));
+  println!("{}", text::success("Calculations completed successfully."));
   println!("Total elapsed time: {:.2} seconds.", elapsed_time.as_secs_f64());
   println!("");
   
