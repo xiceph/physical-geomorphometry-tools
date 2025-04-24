@@ -67,7 +67,15 @@ The tool generates a single output raster file, specified by the `--output-file`
 
 ## Installation
 
-To use this tool, you'll need to build it from the source code. Follow these steps:
+You can either build the tool from source or download a precompiled binary for Windows.
+
+### Option 1: Download Standalone Executable (Windows)
+
+A standalone Windows executable is available for download on the [Releases page](https://github.com/xiceph/physical-geomorphometry-tools/releases). No installation is needed — simply download the `qem_generalization.exe` file and run it from the command line.
+
+### Option 2: Build from Source
+
+To build the tool from source, follow these steps:
 
 ### Prerequisites
 
@@ -91,7 +99,7 @@ After building, you can run the tool as demonstrated in the usage examples.
 
 ## Future Plans
 
-To simplify standalone binary creation, we plan to investigate reducing or eliminating GDAL dependence. This will make the tool more accessible and easier to use.
+We plan to develop a **QGIS plugin** for easier integration of the tool into common geospatial workflows. This will allow users to calculate land surface parameters directly within the QGIS environment, enhancing accessibility and usability across platforms.
 
 ## License
 
