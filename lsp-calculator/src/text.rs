@@ -1,4 +1,12 @@
-use console::style;
+use console::{style, Emoji};
+
+pub static CHECK: Emoji<'static, 'static> = Emoji("✓", "+");
+pub static CROSS: Emoji<'static, 'static> = Emoji("✗", "x");
+pub static ARROW: Emoji<'static, 'static> = Emoji("▶", ">");
+
+pub fn check_icon() -> String {
+    style(format!("{}", CHECK)).green().to_string()
+}
 
 pub fn bold<T: AsRef<str>>(text: T) -> String {
     style(text.as_ref()).bold().to_string()
@@ -27,15 +35,3 @@ pub fn highlight<T: AsRef<str>>(text: T) -> String {
 pub fn light<T: AsRef<str>>(text: T) -> String {
     style(text.as_ref()).color256(245).to_string()
 }
-
-#[cfg(windows)]
-pub const ARROW: &str = ">";
-
-#[cfg(not(windows))]
-pub const ARROW: &str = "▶";
-
-#[cfg(windows)]
-pub const CHECK: &str = "v";
-
-#[cfg(not(windows))]
-pub const CHECK: &str = "✓";

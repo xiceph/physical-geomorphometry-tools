@@ -347,7 +347,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   let elevation = raster::Grid::<f32>::from_raster_band(raster_params, &rasterband);
   
   let elapsed_time1 = part_time.elapsed();
-  println!("{} Input raster ({} x {}) read in {:.2} seconds.", text::success(text::CHECK), width, height, elapsed_time1.as_secs_f64());
+  println!("{} Input raster ({} x {}) read in {:.2} seconds.", text::check_icon(), width, height, elapsed_time1.as_secs_f64());
   part_time = Instant::now();
   
   // Retrieves the 5x5 neighborhood around the specified row and column index,
@@ -580,7 +580,7 @@ fn main() -> Result<(), Box<dyn Error>> {
       }
       
       let elapsed_time = part_time.elapsed();
-      println!("\r\x1B[K{} Land Surface Parameters calculated in {:.2} seconds.", text::success(text::CHECK), elapsed_time.as_secs_f64());
+      println!("\r\x1B[K{} Land Surface Parameters calculated in {:.2} seconds.", text::check_icon(), elapsed_time.as_secs_f64());
       part_time = Instant::now();
       
       // For each selected parameter, create an output GeoTIFF file.
@@ -621,7 +621,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
       }
       let elapsed_time = part_time.elapsed();
-      println!("{} Output files written in {:.2} seconds.", text::success(text::CHECK), elapsed_time.as_secs_f64());
+      println!("{} Output files written in {:.2} seconds.", text::check_icon(), elapsed_time.as_secs_f64());
     }
     Err(err) => {
       println!("Chyba: {}", err);
