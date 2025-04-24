@@ -1,24 +1,28 @@
-pub fn bold(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[1m");
-    format!("\x1b[1m{}\x1b[0m", modified_text)
+use console::{style, Emoji};
+
+pub static CHECK: Emoji<'static, 'static> = Emoji("✓", "+");
+pub static CROSS: Emoji<'static, 'static> = Emoji("✗", "x");
+
+pub fn check_icon() -> String {
+    style(format!("{}", CHECK)).green().to_string()
 }
 
-pub fn error(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[31m");
-    format!("\x1b[31m{}\x1b[0m", modified_text)
+pub fn bold<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).bold().to_string()
 }
 
-pub fn warning(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[35;93m");
-    format!("\x1b[35;93m{}\x1b[0m", modified_text)
+pub fn error<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).red().to_string()
 }
 
-pub fn success(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[92m");
-    format!("\x1b[92m{}\x1b[0m", modified_text)
+pub fn warning<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).color256(214).bold().to_string()
 }
 
-pub fn highlight(text: String) -> String {
-    let modified_text = text.replace("\x1b[0m", "\x1b[0m\x1b[94m");
-    format!("\x1b[94m{}\x1b[0m", modified_text)
+pub fn success<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).green().to_string()
+}
+
+pub fn highlight<T: AsRef<str>>(text: T) -> String {
+    style(text.as_ref()).blue().bold().to_string()
 }

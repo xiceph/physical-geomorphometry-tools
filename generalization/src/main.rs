@@ -10,6 +10,7 @@ use std::sync::{mpsc, Arc};
 use std::thread;
 use num_cpus;
 use rand::Rng;
+use console::Term;
 
 mod math;
 mod raster;
@@ -77,9 +78,9 @@ fn main() -> Result<(), Box<dyn Error>> {
   Part of a {} project.\n\n\
   Author:\n{}\n\
   {}\n",
-  text::highlight(format!("{} {}", text::bold("Raster QEM Generalize".to_string()), app.get_version().unwrap())),
+  format!("{} {}", text::highlight("Raster QEM Generalize"), app.get_version().unwrap()),
   line,
-  text::highlight("physical-geomorphometry".to_string()),
+  text::highlight("physical-geomorphometry"),
   app.get_author().unwrap(),
   dline);
 
@@ -101,7 +102,7 @@ fn main() -> Result<(), Box<dyn Error>> {
       if value > 500 {
         println!(
           "{}: 'iterations' value is unusually high ({}). This might cause long computation times.\n",
-          text::warning("Warning".to_string()),
+          text::warning("Warning"),
           value
         );
       }
@@ -124,7 +125,7 @@ fn main() -> Result<(), Box<dyn Error>> {
       if value == 1.0 && iterations > 200 {
         println!(
           "{}: 'iterations' value is high ({}) and not using resolution reduction. Consider using resolution reduction for faster calculation.\n",
-          text::warning("Warning".to_string()),
+          text::warning("Warning"),
           iterations
         );
       }
@@ -144,11 +145,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     match jobs_str.parse::<usize>() {
       Ok(max_jobs) if max_jobs > 0 => std::cmp::min(max_jobs, num_procs), // If valid and > 0, use the smaller value
       Ok(_) => {
-        println!("{}: 'jobs' value must be greater than 0. Using the number of processors.\n", text::warning("Warning".to_string()));
+        println!("{}: 'jobs' value must be greater than 0. Using the number of processors.\n", text::warning("Warning"));
         num_procs
       },
       Err(_) => {
-        println!("{}: 'jobs' value is not a valid number. Using the number of processors.\n", text::warning("Warning".to_string()));
+        println!("{}: 'jobs' value is not a valid number. Using the number of processors.\n", text::warning("Warning"));
         num_procs
       }
     }
@@ -174,7 +175,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   // Open the input raster file
   let dataset = Dataset::open(input_file)
   .unwrap_or_else(|_| {
-    let output = format!("{}: Failed to open input file: {}", text::error("Error".to_string()), input_file);
+    let output = format!("{}: Failed to open input file: {}", text::error("Error"), input_file);
     eprintln!("{}\n", text::bold(output));
     std::process::exit(1);
   });
@@ -213,9 +214,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
   let elapsed_time1 = part_time.elapsed();
   if reduction > 1.0 {
-    println!("{} Input raster ({}x{}) read and resampled to {}x{} in {:.2} s.", text::success("✓".to_string()), width, height, width_red, height_red, elapsed_time1.as_secs_f64());
+    println!("{} Input raster ({}x{}) read and resampled to {}x{} in {:.2} s.", text::check_icon(), width, height, width_red, height_red, elapsed_time1.as_secs_f64());
   } else {
-    println!("{} Input raster ({}x{}) read in {:.2} s.", text::success("✓".to_string()), width, height, elapsed_time1.as_secs_f64());
+    println!("{} Input raster ({}x{}) read in {:.2} s.", text::check_icon(), width, height, elapsed_time1.as_secs_f64());
   }
   part_time = Instant::now();
 
@@ -486,7 +487,7 @@ fn main() -> Result<(), Box<dyn Error>> {
       }
 
       let elapsed_time = part_time.elapsed();
-      println!("{} Q matrices initialized in {:.2} s.", text::success("✓".to_string()), elapsed_time.as_secs_f64());
+      println!("{} Q matrices initialized in {:.2} s.", text::check_icon(), elapsed_time.as_secs_f64());
       part_time = Instant::now();
 
       let mut current_error = 0.0;
@@ -561,12 +562,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         // Calculate the current error as the percentile of collected errors
         current_error = data::percentile(&mut errors, (percentile * 100.0) as f64);
 
-        print!("\r{}- Generalization progress: {} %", "\x1B[K", (iteration * 100) / iterations);
+        let term = Term::stdout();
+        term.clear_line().unwrap();
+        print!("\r- Generalization progress: {} %", (iteration * 100) / iterations);
         io::stdout().flush().unwrap();
       }
 
       let elapsed_time = part_time.elapsed();
-      println!("\r\x1B[K{} Generalized in {:.2} s.", text::success("✓".to_string()), elapsed_time.as_secs_f64());
+      let term = Term::stdout();
+      term.clear_line().unwrap();
+      println!("\r{} Generalized in {:.2} s.", text::check_icon(), elapsed_time.as_secs_f64());
 
       // Helper function to generate a random string for unique raster naming
       fn generate_random_string() -> String {
