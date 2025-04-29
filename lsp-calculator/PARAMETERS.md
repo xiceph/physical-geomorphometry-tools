@@ -123,7 +123,7 @@ General expression of gravity discordant (twisting) energy of flow (change of fl
 
 ### Difference curvature - _k<sub>d</sub>_
 
-Expression of summary energetic effect of profile and plan curvature on energy of gravity flow (local excess of flow energy).
+Expression of summary energetic effect of profile and tangential curvature on energy of gravity flow (local excess of flow energy).
 
 ```math
 k_d = \frac{(k_n)_s - (k_n)_c}{2}
@@ -147,7 +147,7 @@ K_r = (k_n)_c \cdot (k_n)_s - k_{\text{min}} \cdot ((k_n)_c + (k_n)_s) + {k_\tex
 
 ### Horizontal excess curvature - _k<sub>he</sub>_
 
-Partial measure of gravity discordant curvature expressing difference between basic profile curvature (_k<sub>n</sub>_)_<sub>c</sub>_ and minimal curvature _k<sub>min</sub>_.
+Partial measure of gravity discordant curvature expressing difference between basic plan curvature (_k<sub>n</sub>_)_<sub>c</sub>_ (known also as tangential curvature) and minimal curvature _k<sub>min</sub>_.
 
 ```math
 k_{he} = (k_n)_c - k_{\text{min}}
@@ -155,7 +155,7 @@ k_{he} = (k_n)_c - k_{\text{min}}
 
 ### Vertical excess curvature - _k<sub>ve</sub>_
 
-Partial measure of gravity discordant curvature expressing difference between basic plan curvature (_k<sub>n</sub>_)_<sub>s</sub>_ and minimal curvature _k<sub>min</sub>_.
+Partial measure of gravity discordant curvature expressing difference between basic profile curvature (_k<sub>n</sub>_)_<sub>s</sub>_ and minimal curvature _k<sub>min</sub>_.
 
 ```math
 k_{ve} = (k_n)_s - k_{\text{min}}
