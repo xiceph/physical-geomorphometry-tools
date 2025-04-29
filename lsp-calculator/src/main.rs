@@ -62,13 +62,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     ("khe", "Horizontal excess curvature"),
     ("kve", "Vertical excess curvature"),
     // Principal curvatures
-    ("k_max", "Maximal curvature"),
-    ("k_min", "Minimal curvature"),
+    ("kmax", "Maximal curvature"),
+    ("kmin", "Minimal curvature"),
     // Other gravity-invariant curvatures
     ("k", "Gaussian curvature"),
     ("el", "Elevation laplacian"),
     ("ku", "Unsphericity curvature"),
-    ("k_mean", "Mean curvature"),
+    ("kmean", "Mean curvature"),
     ("kc", "Casorati curvature"),
     // Changes of curvatures
     ("knss", "Slope line change of normal slope line curvature"),
@@ -91,7 +91,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   ];
 
   let group_first = vec!["slope", "aspect", "sin_slope", "sin_aspect", "cos_aspect"];
-  let group_second = vec!["kns", "knc", "tc", "zss", "ts", "zcc", "kpc", "kps", "sin_sc", "kd", "ka", "kr", "khe", "kve", "k_max", "k_min", "k", "el", "ku", "k_mean", "kc"];
+  let group_second = vec!["kns", "knc", "tc", "zss", "ts", "zcc", "kpc", "kps", "sin_sc", "kd", "ka", "kr", "khe", "kve", "kmax", "kmin", "k", "el", "ku", "kmean", "kc"];
   let group_third = vec!["knss", "kncc", "kncs"];
   let group_segmentation = vec!["sin_slope", "sin_aspect", "cos_aspect", "kns", "knc", "tc", "knss", "kncc", "kncs"];
   let group_partials = vec![ "z_fit", "zx", "zy", "zxx", "zxy", "zyy", "zxxx", "zxxy", "zxyy", "zyyy" ];

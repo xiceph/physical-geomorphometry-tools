@@ -47,9 +47,22 @@ qem_generalization -i dem.tif -o output.tif -n 50 -r 2.0 -s 7
 qem_generalization -i dem.tif -o output.tif -j 4
 ```
 
+#### Example with full paths (Windows)
+
+```bash
+C:\tools\qem_generalization.exe -i C:\data\dems\sample_dem.tif -o C:\results\generalized_output.tif
+```
+
+#### Example with full paths (Linux)
+
+```bash
+/home/user/tools/qem_generalization -i /home/user/data/sample_dem.tif -o /home/user/results/generalized_output.tif
+```
+
+
 ### Output
 
-The tool generates a single output raster file, specified by the `--output-file` argument. The output raster reflects the generalized land surface based on the selected parameters.
+The tool generates a single GeoTIFF raster file at the location specified by the `--output-file` (`-o`) argument. The output raster reflects the generalized land surface based on the selected parameters.
 
 ## How it Works
 

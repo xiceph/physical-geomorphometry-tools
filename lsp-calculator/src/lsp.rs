@@ -148,15 +148,15 @@ pub fn calculate(
           // Calculate Elevation laplacian
           (knc * cos_slope2 + kns) / (cos_slope2 * cos_slope)
         },
-        "k_max" => {
+        "kmax" => {
           // Use Maximal curvature
           k_max
         },
-        "k_min" => {
+        "kmin" => {
           // Use Minimal curvature
           k_min
         },
-        "k_mean" => {
+        "kmean" => {
           // Calculate Mean curvature
           (kns + knc) / 2.0
         },

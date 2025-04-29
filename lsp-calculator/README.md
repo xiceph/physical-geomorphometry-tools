@@ -124,12 +124,12 @@ You can choose one or more specific parameters to calculate using the following 
 - `--kr`: Total ring curvature
 - `--khe`: Horizontal excess curvature
 - `--kve`: Vertical excess curvature
-- `--k_max`: Maximal curvature
-- `--k_min`: Minimal curvature
+- `--kmax`: Maximal curvature
+- `--kmin`: Minimal curvature
 - `--k`: Gaussian curvature
 - `--el`: Elevation laplacian
 - `--ku`: Unsphericity curvature
-- `--k_mean`: Mean curvature
+- `--kmean`: Mean curvature
 - `--kc`: Casorati curvature
 - `--kncc`: Contour change of normal contour curvature
 - `--kncs`: Slope line change of normal contour curvature
@@ -178,13 +178,56 @@ lsp_calculator -i dem.tif -o output --slope --aspect
 lsp_calculator -i dem.tif -o output --partials
 ```
 
+#### Example with full paths (Windows)
+
+```bash
+C:\tools\lsp_calculator.exe -i C:\data\dems\sample_dem.tif -o C:\results\sample_output --all
+```
+
+#### Example with full paths (Linux)
+
+```bash
+/home/user/tools/lsp_calculator -i /home/user/data/sample_dem.tif -o /home/user/results/sample_output --all
+```
+
 ### Output
 
-The output consists of separate GeoTIFF files for each calculated parameter. Each file is named according to the format: `<output-prefix>_<parameter>.tif`.
+The output consists of separate GeoTIFF files for each calculated parameter. Each file is named using the full output path followed by a suffix indicating the parameter. The `.tif` extension is automatically added. The format is:
 
-For example, when calculating slope and aspect, the following files are produced:
+```
+<output-path>_<parameter>.tif
+```
+
+For example, using:
+
+```bash
+lsp_calculator -i dem.tif -o output --slope --aspect
+```
+
+Produces:
 - `output_slope.tif`
 - `output_aspect.tif`
+
+Or using:
+
+```bash
+-o C:\results\sample_output
+```
+
+Produces:
+- `C:\results\sample_output_slope.tif`
+- `C:\results\sample_output_aspect.tif`
+
+Or on Linux:
+
+```bash
+-o /home/user/results/sample_output
+```
+
+Produces:
+- `/home/user/results/sample_output_slope.tif`
+- `/home/user/results/sample_output_aspect.tif`
+
 
 ## How it Works
 
