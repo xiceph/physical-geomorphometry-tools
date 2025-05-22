@@ -17,6 +17,10 @@ This tool is part of the larger **physical-geomorphometry** project, which provi
 - **Customizable Outputs**:
   - Specify input and output file paths, and fine-tune generalization parameters.
 
+## Theoretical Background
+
+The core algorithm implemented in this project is based on the principles outlined in the article _Advancing raster DEM generalization with a quadric error metric approach_ by Feciskanin & Minár. (2025)[^1]. This paper introduces a unique adaptation of Quadric Error Metrics to operate on raster DEM, which helps preserving essential landforms, even at high levels of generalization. For a comprehensive understanding, please refer to the original publication.
+
 ## Usage
 
 ### Command-Line Arguments
@@ -117,3 +121,7 @@ We plan to develop a **QGIS plugin** for easier integration of the tool into com
 ## License
 
 This project is licensed under the MIT License.
+
+ 
+
+[^1]: Feciskanin, R., Minár, J. (2025). Advancing raster DEM generalization with a quadric error metric approach. Computers and Geosciences, 202, 105963. https://doi.org/10.1016/j.cageo.2025.105963.
