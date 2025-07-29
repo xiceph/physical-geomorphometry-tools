@@ -17,6 +17,7 @@ mod raster;
 mod qem;
 mod data;
 mod text;
+mod helpers;
 
 fn main() -> Result<(), Box<dyn Error>> {
   let start_time = Instant::now();
@@ -140,23 +141,27 @@ fn main() -> Result<(), Box<dyn Error>> {
   };
 
   // Determine the number of threads to use
-  let num_procs = num_cpus::get() as usize;
-  let jobs = if let Some(jobs_str) = matches.get_one::<String>("jobs") {
-    match jobs_str.parse::<usize>() {
-      Ok(max_jobs) if max_jobs > 0 => std::cmp::min(max_jobs, num_procs), // If valid and > 0, use the smaller value
-      Ok(_) => {
-        println!("{}: 'jobs' value must be greater than 0. Using the number of processors.\n", text::warning("Warning"));
-        num_procs
-      },
-      Err(_) => {
-        println!("{}: 'jobs' value is not a valid number. Using the number of processors.\n", text::warning("Warning"));
-        num_procs
+  let max_cores_from_config = helpers::load_config_value("max_cores").and_then(|s| s.parse::<usize>().ok());
+  let mut jobs_opt = matches.get_one::<String>("jobs").and_then(|s| s.parse::<usize>().ok());
+
+  if let Some(max_cores) = max_cores_from_config {
+    if let Some(job_count) = jobs_opt {
+      if job_count > max_cores {
+        println!(
+          "{}: Number of jobs ({}) set by command line exceeds the maximum\nallowed in config file ({}). Using {} jobs instead.\n",
+          text::warning("Warning"),
+          job_count,
+          max_cores,
+          max_cores
+        );
+        jobs_opt = Some(max_cores);
       }
+    } else {
+      jobs_opt = Some(max_cores);
     }
-  } else {
-    // If no value is provided, default to using the number of processors
-    num_procs
-  };
+  }
+
+  let jobs = jobs_opt.unwrap_or_else(num_cpus::get);
 
   // Summarize initial settings to the user
   println!("Generalize starts with settings:");
@@ -168,6 +173,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   } else {
     println!("Resolution remains unchanged");
   }
+  println!("Using {} thread(s) for parallel processing.", jobs);
   println!("{}\n", dline);
 
   let mut part_time = Instant::now();

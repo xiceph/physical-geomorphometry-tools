@@ -25,14 +25,14 @@ The core algorithm implemented in this project is based on the principles outlin
 
 ### Command-Line Arguments
 
-| Argument              | Short | Description                                                                              | Default Value |
-|-----------------------|-------|------------------------------------------------------------------------------------------|---------------|
-| `--input-file`        | `-i`  | Specify the input raster file path (required).                                           | N/A           |
-| `--output-file`       | `-o`  | Specify the output raster file path (required).                                          | N/A           |
-| `--iterations`        | `-n`  | Number of iterations for generalization.                                                 | `10`          |
-| `--reduction`         | `-r`  | Resolution reduction factor (≥ 1.0).                                                     | `1.0`         |
-| `--sharpness`         | `-s`  | Sharpness level for edge retention (1-9).                                                | `5`           |
-| `--jobs`              | `-j`  | Number of threads to use (if omitted, all available processors are used).                | All available |
+| Argument              | Short | Description                                   | Default Value                  |
+|-----------------------|-------|-----------------------------------------------|--------------------------------|
+| `--input-file`        | `-i`  | Input raster file (required).                 | N/A                            |
+| `--output-file`       | `-o`  | Output raster file (required).                | N/A                            |
+| `--iterations`        | `-n`  | Number of generalization iterations.          | `10`                           |
+| `--reduction`         | `-r`  | Resolution reduction factor (≥ 1.0).          | `1.0`                          |
+| `--sharpness`         | `-s`  | Sharpness for edge retention (1-9).           | `5`                            |
+| `--jobs`              | `-j`  | Number of threads. See Configuration section. | From config or all available   |
 
 ### Example Usage
 
@@ -67,6 +67,21 @@ C:\tools\qem_generalization.exe -i C:\data\dems\sample_dem.tif -o C:\results\gen
 ### Output
 
 The tool generates a single GeoTIFF raster file at the location specified by the `--output-file` (`-o`) argument. The output raster reflects the generalized land surface based on the selected parameters.
+
+## Configuration
+
+The tool can be configured using an `app.config` file located in the same directory as the executable. This file allows you to set parameters that control the tool's behavior.
+
+### Available Parameters
+
+- `max_cores`: Specifies the maximum number of CPU cores the tool is allowed to use. If the `--jobs` argument is provided and its value exceeds `max_cores`, the value from the configuration file will be used instead.
+
+### Example `app.config`
+
+To limit the tool to using a maximum of 4 cores, create an `app.config` file with the following content:
+```ini
+max_cores = 4
+```
 
 ## How it Works
 

@@ -86,7 +86,7 @@ lsp_calculator [OPTIONS]
 ### Optional Arguments
 
 - `-d, --degree <degree>`: Specify the polynomial degree (3 or 4). Default is `3`.
-- `-j, --jobs <jobs>`: Specify the number of threads to use. If omitted, all available processors are used.
+- `-j, --jobs <jobs>`: Specify the number of threads to use. If omitted, the value from `app.config` or all available processors is used.
 - `-h, --help`: Print help.
 - `-V, --version`: Print version.
 
@@ -228,6 +228,21 @@ Produces:
 - `/home/user/results/sample_output_slope.tif`
 - `/home/user/results/sample_output_aspect.tif`
 
+
+## Configuration
+
+The tool can be configured using an `app.config` file located in the same directory as the executable. This file allows you to set parameters that control the tool's behavior.
+
+### Available Parameters
+
+- `max_cores`: Specifies the maximum number of CPU cores the tool is allowed to use. If the `--jobs` argument is provided and its value exceeds `max_cores`, the value from the configuration file will be used instead.
+
+### Example `app.config`
+
+To limit the tool to using a maximum of 4 cores, create an `app.config` file with the following content:
+```ini
+max_cores = 4
+```
 
 ## How it Works
 
