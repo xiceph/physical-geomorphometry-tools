@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eCog.Proc UserName="KFG_Segment" Company="" Copyright="" version="20181002" use-reproducable-poly="1" project-unit="5" engine-version="10.5.0" engine-build="5490" update-topology="0" distance_calculation="CG" resampling_compatibility="0" ver="0">
+	<ruleset-info>
+		<name></name>
+		<author>KFG_Segment</author>
+		<tags></tags>
+		<version></version>
+		<description></description>
+		<input></input>
+		<output></output>
+	</ruleset-info>
+	<ParamValueSetCntnr></ParamValueSetCntnr>
+	<ObjectDependencies>
+		<ImgLayers>
+			<ChnlProxyCntnr>
+				<Layers>
+					<ChnlProxy strName="cosA" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="dem" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="knc" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="kncc" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="kncs" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="kns" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="knss" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="sinA" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="sinS" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="tc" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 1" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 2" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 3" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 4" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 5" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 6" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 7" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 8" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 9" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="Layer 10" flags="4">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+					<ChnlProxy strName="elev" flags="12">
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+					</ChnlProxy>
+				</Layers>
+				<Variables></Variables>
+			</ChnlProxyCntnr>
+		</ImgLayers>
+		<ThmLayers>
+			<ChnlProxyCntnr>
+				<Layers></Layers>
+				<Variables></Variables>
+			</ChnlProxyCntnr>
+		</ThmLayers>
+		<MapLvlProxyCntnr>
+			<MapLvlProxies>
+				<MapLvlProxy strName="Pixel Level" bVrbl="0">
+					<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+				</MapLvlProxy>
+				<MapLvlProxy strName="New Level" bVrbl="0">
+					<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+				</MapLvlProxy>
+				<MapLvlProxy strName="Level 1" bVrbl="0">
+					<Assignment MapLvl="1" MapName="main"></Assignment>
+					<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+				</MapLvlProxy>
+			</MapLvlProxies>
+			<MapLvlVrblValues></MapLvlVrblValues>
+		</MapLvlProxyCntnr>
+		<ProcVrblCntnr>
+			<ProcVrbl iId="0" eType="1">
+				<DValue value="100." type="double"></DValue>
+				<NameExpr strTextExpr="SP"></NameExpr>
+				<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+				<SharedInfo bShared="0" strInstGUID=""></SharedInfo>
+			</ProcVrbl>
+		</ProcVrblCntnr>
+		<ClssHrchy EvalInvalid="1" MinProb="0.10000000000000000555111512312578270212" NNSlope="0.20000000000000001110223024625156540424" RdiResamplOptns="3">
+			<AllClss></AllClss>
+			<PropTree version="20100426">
+				<AllProps>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349406" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation cosA"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="cosA" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349413" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation dem"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="dem" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349424" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation knc"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="knc" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349430" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation kncc"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="kncc" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349437" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation kncs"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="kncs" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349445" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation kns"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="kns" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349451" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation knss"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="knss" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349456" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation sinA"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="sinA" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349462" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation sinS"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="sinS" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349467" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation tc"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="tc" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="16777218" strUserName="KFG_Segment" tChngTime="1762349476" group_id="object.cust.prop">
+						<PropDscrId GUID="E869FC89-440F-41e4-A7DF-1E9DE9040CEC" InstID="Sum_SD"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue value="_Sum_SD" type="string" name="NameExpr"></DValue>
+							<DValue type="vector" name="valPropVctr">
+								<Values>
+									<DValue type="propDscrId" indx="0">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation cosA"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="1">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation dem"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="2">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation knc"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="3">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation kncc"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="4">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation kncs"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="5">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation kns"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="6">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation knss"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="7">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation sinA"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="8">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation sinS"></PropDscrId>
+									</DValue>
+									<DValue type="propDscrId" indx="9">
+									<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation tc"></PropDscrId>
+									</DValue>
+								</Values>
+							</DValue>
+							<DValue value="(d00;+d01;+d02;+d03;+d04;+d05;+d06;+d07;+d08;+d09;)" type="string" name="strExpr"></DValue>
+							<DValue value="0" type="int" name="iUnit"></DValue>
+							<DValue value="" type="string" name="Comment"></DValue>
+							<DValue value="1" type="bool" name="bUseDeg"></DValue>
+							<DValue value="1" type="bool" name="bUseUnit"></DValue>
+							<DValue value="0" type="bool" name="bShared"></DValue>
+							<DValue value="" type="string" name="strInstGUID"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2147483650" strUserName="KFG_Segment" tChngTime="1762349376" group_id="global.object.vrbl.vrbl_arr.prop">
+						<PropDscrId GUID="5EB15E4B-593A-432f-A0ED-9B38627475D2" InstID="SP"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue value="_SP" type="string" name="NameExpr"></DValue>
+							<DValue value="100." type="double" name="vVal"></DValue>
+							<DValue value="0" type="bool" name="bShared"></DValue>
+							<DValue value="" type="string" name="strInstGUID"></DValue>
+						</Params>
+					</PropDscr>
+					<PropDscr Flag="2" strUserName="KFG_Segment" tChngTime="1762349418" group_id="stdev.chnl.object.prop">
+						<PropDscrId GUID="4B11667E-1449-440f-8D7B-0A4D90E62B3E" InstID="Standard deviation elev"></PropDscrId>
+						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						<Params>
+							<DValue type="img_chnl" value="elev" scope="" name="valChnl"></DValue>
+						</Params>
+					</PropDscr>
+				</AllProps>
+				<UserGroups></UserGroups>
+			</PropTree>
+			<Brightness>
+				<Map MapName="main">
+					<ChnlWghtBrght>
+						<BrghtWght val="1." chnl="0"></BrghtWght>
+						<BrghtWght val="1." chnl="1"></BrghtWght>
+						<BrghtWght val="1." chnl="2"></BrghtWght>
+						<BrghtWght val="1." chnl="3"></BrghtWght>
+						<BrghtWght val="1." chnl="4"></BrghtWght>
+						<BrghtWght val="1." chnl="5"></BrghtWght>
+						<BrghtWght val="1." chnl="6"></BrghtWght>
+						<BrghtWght val="1." chnl="7"></BrghtWght>
+						<BrghtWght val="1." chnl="8"></BrghtWght>
+						<BrghtWght val="1." chnl="9"></BrghtWght>
+					</ChnlWghtBrght>
+				</Map>
+			</Brightness>
+			<AllVrblClss></AllVrblClss>
+			<AllSubClss></AllSubClss>
+			<AllTerm></AllTerm>
+		</ClssHrchy>
+		<MapVrblCntnr></MapVrblCntnr>
+		<FtrListVrblCntnr></FtrListVrblCntnr>
+		<CoordVrblCntnr></CoordVrblCntnr>
+		<ROIVrblCntnr></ROIVrblCntnr>
+		<ImgObjListVrblCntnr></ImgObjListVrblCntnr>
+		<ArrayCntnr>
+			<Arrays></Arrays>
+			<ArrayVrbls></ArrayVrbls>
+		</ArrayCntnr>
+		<Smpls>
+			<AllClss></AllClss>
+		</Smpls>
+		<plugin-list>
+			<plugin name="eCognition Internal Process Algorithms" version="0.1"></plugin>
+			<plugin name="eCognition Internal Export Process Algorithms" version="0.1"></plugin>
+		</plugin-list>
+	</ObjectDependencies>
+	<CustProcAlgrList></CustProcAlgrList>
+	<ExternalCustProcAlgrList></ExternalCustProcAlgrList>
+	<ProcessList>
+		<ProcBase Name="multi-resolution: SP [shape:0.1 compct.:0.5] creating 'Level 1'" bLoopChg="0" bExpand="1" bActive="1" bAutoName="1" bSubrtn="0">
+			<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+			<vrblValMaxCycle>
+				<DValue value="1." type="double"></DValue>
+			</vrblValMaxCycle>
+			<Algorithm guid="6534F2E1-485B-406f-B990-350824399FA8">
+				<Params>
+					<DValue value="1" type="bool" name="bDoOverwrite"></DValue>
+					<DValue type="lvlName" name="valMapLvl">
+						<MapLvlProxy strName="Level 1" bVrbl="0">
+							<Assignment MapLvl="1" MapName="main"></Assignment>
+							<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						</MapLvlProxy>
+					</DValue>
+					<DValue value="0" type="int" name="eLvlUsage"></DValue>
+					<DValue value="-1" type="int" name="iCompMode"></DValue>
+					<DValue type="vector" name="vImgLayerWghtVarOrValue">
+						<Values>
+							<DValue type="vector" indx="0">
+								<Values>
+									<DValue type="img_chnl" value="elev" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="1">
+								<Values>
+									<DValue type="img_chnl" value="knc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="2">
+								<Values>
+									<DValue type="img_chnl" value="kncc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="3">
+								<Values>
+									<DValue type="img_chnl" value="kncs" scope="" indx="0"></DValue>
+									<DValue value="2." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="4">
+								<Values>
+									<DValue type="img_chnl" value="kns" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="5">
+								<Values>
+									<DValue type="img_chnl" value="knss" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="6">
+								<Values>
+									<DValue type="img_chnl" value="sinS" scope="" indx="0"></DValue>
+									<DValue value="2." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="7">
+								<Values>
+									<DValue type="img_chnl" value="tc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+						</Values>
+					</DValue>
+					<DValue type="vector" name="vImgLayerWght">
+						<Values>
+							<DValue type="vector" indx="0">
+								<Values>
+									<DValue type="img_chnl" value="elev" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="1">
+								<Values>
+									<DValue type="img_chnl" value="knc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="2">
+								<Values>
+									<DValue type="img_chnl" value="kncc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="3">
+								<Values>
+									<DValue type="img_chnl" value="kncs" scope="" indx="0"></DValue>
+									<DValue value="2." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="4">
+								<Values>
+									<DValue type="img_chnl" value="kns" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="5">
+								<Values>
+									<DValue type="img_chnl" value="knss" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="6">
+								<Values>
+									<DValue type="img_chnl" value="sinS" scope="" indx="0"></DValue>
+									<DValue value="2." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="7">
+								<Values>
+									<DValue type="img_chnl" value="tc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+						</Values>
+					</DValue>
+					<DValue type="vector" name="vThmLayers">
+						<Values></Values>
+					</DValue>
+					<DValue value="0" type="procVarId" name="vrblValScale"></DValue>
+					<DValue value="0.10000000000000000555111512312578270212" type="double" name="vrblHCShape"></DValue>
+					<DValue value="0.5" type="double" name="vrblHCArea"></DValue>
+				</Params>
+			</Algorithm>
+			<Domain guid="682A3AA1-9F4F-4dae-9E44-5015DF867712">
+				<Params>
+					<DValue type="threshold" name="valThrsh"></DValue>
+					<DValue type="threshold" name="valThrsh2"></DValue>
+					<DValue value="From Parent" type="string" name="valMap"></DValue>
+				</Params>
+			</Domain>
+			<SubProc></SubProc>
+		</ProcBase>
+		<ProcBase Name="at Level 1: export object shapes to ObjectShapes" bLoopChg="0" bExpand="1" bActive="1" bAutoName="1" bSubrtn="0">
+			<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
+			<vrblValMaxCycle>
+				<DValue value="1." type="double"></DValue>
+			</vrblValMaxCycle>
+			<Algorithm guid="E8AAA2C4-4DCA-4684-A918-87E7C53CDC8D">
+				<Params>
+					<DValue value="0" type="int" name="eExportMode"></DValue>
+					<DValue value="ObjectShapes" type="string" name="strExportItem"></DValue>
+					<DValue value="-1" type="procVarId" name="vrblExportItem"></DValue>
+					<DValue value="{:Workspc.OutputRoot}\results\{:Project.Name}.{:Ext}" type="string" name="strExportPath"></DValue>
+					<DValue value="0" type="bool" name="bExportSeries"></DValue>
+					<DValue value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;ExportInfo SingleFilePerWksp=&quot;0&quot; SingleFilePerItem=&quot;1&quot; ExportItem=&quot;ObjectShapes&quot; ExportType=&quot;Vector&quot; DriverID=&quot;SHP&quot; ExportPath=&quot;{:Workspc.OutputRoot}\results\{:Project.Name}.{:Ext}&quot;>&lt;/ExportInfo>" type="string" name="strExportItemInfo"></DValue>
+					<DValue value="temporary" type="string" name="valExportTempLayer"></DValue>
+					<DValue type="vector" name="vColInfo">
+						<Values>
+							<DValue type="vector" indx="0">
+								<Values>
+									<DValue type="propDscrId" indx="0">
+									<PropDscrId GUID="E869FC89-440F-41e4-A7DF-1E9DE9040CEC" InstID="Sum_SD"></PropDscrId>
+									</DValue>
+									<DValue value="Sum_SD" type="string" indx="1"></DValue>
+									<DValue value="2" type="int" indx="2"></DValue>
+									<DValue value="-1" type="int" indx="3"></DValue>
+									<DValue value="-1" type="int" indx="4"></DValue>
+								</Values>
+							</DValue>
+						</Values>
+					</DValue>
+					<DValue value="0" type="bool" name="bUseFtrList"></DValue>
+					<DValue value="Sum_SD" type="string" name="EditAttrTbl"></DValue>
+					<DValue value="-1" type="procVarId" name="FeatureListAttrTbl"></DValue>
+					<DValue value="3" type="int" name="eGeomType"></DValue>
+					<DValue value="5" type="int" name="eExprtType"></DValue>
+					<DValue value="1" type="bool" name="bShpUseGeocoding"></DValue>
+					<DValue value="0" type="int" name="eCoordOrient"></DValue>
+					<DValue value="SHP" type="string" name="eExprtFormat"></DValue>
+					<DValue value="ObjectShapes" type="string" name="featClassName"></DValue>
+					<DValue type="img_chnl" value="" name="pRefChnl"></DValue>
+					<DValue value="{:ArcSDE.Connect.Dir}\default.das" type="string" name="exprtStorageLocFile"></DValue>
+					<DValue value="0,0" type="string" name="spatDomainOffset"></DValue>
+					<DValue value="1000" type="string" name="spatDomainPrec"></DValue>
+				</Params>
+			</Algorithm>
+			<Domain guid="CED621BD-F4D1-4ffa-A2F6-DB2BB1913E8C">
+				<Params>
+					<DValue type="lvlName" name="valMapLvl">
+						<MapLvlProxy strName="Level 1" bVrbl="0">
+							<Assignment MapLvl="1" MapName="main"></Assignment>
+							<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
+						</MapLvlProxy>
+					</DValue>
+					<DValue type="vector" name="mClssFltr">
+						<Values>
+							<DValue value="Disabled" type="string" indx="0"></DValue>
+						</Values>
+					</DValue>
+					<DValue type="threshold" name="valThrsh"></DValue>
+					<DValue type="threshold" name="valThrsh2"></DValue>
+					<DValue value="From Parent" type="string" name="valMap"></DValue>
+					<DValue value="From Parent" type="string" name="valROI"></DValue>
+					<DValue value="0" type="int" name="iNumMaxObj"></DValue>
+					<DValue value="4" type="int" name="iVersion"></DValue>
+					<DValue value="-1" type="int" name="iOldLvl"></DValue>
+					<DValue value="0" type="int" name="iOldDsplLvl"></DValue>
+					<DValue value="0" type="int" name="iOldDsplNumLvl"></DValue>
+					<DValue value="0" type="bool" name="bSmplOnly"></DValue>
+				</Params>
+			</Domain>
+			<SubProc></SubProc>
+		</ProcBase>
+	</ProcessList>
+	<ExportedItems>
+		<item name="ObjectShapes" type="Vector" driver="SHP" ext="shp" path="{:Workspc.OutputRoot}\results\{:Project.Name}.{:Ext}"></item>
+	</ExportedItems>
+	<LcnsIds></LcnsIds>
+</eCog.Proc>
