@@ -54,7 +54,7 @@ def calculate_LSPs(input_raster):
         basename = os.path.basename(lsp_file)
         out_file = os.path.join(final_out_dir, basename)
         
-        command = ["raster_tool", "-i", lsp_file, "-o", out_file, "-c", "1"]
+        command = ["raster_tools", "-i", lsp_file, "-o", out_file, "-c", "1"]
         if "_kn" in basename or "_tc" in basename:
             command.extend(["-n", "-r"])
         else:
