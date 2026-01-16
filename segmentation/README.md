@@ -33,7 +33,7 @@ Before using this workflow, ensure you have the following software installed and
 
 This script performs the following actions:
 -   Calculates a suite of LSPs for land surface segmentation (Sine of Slope, Sine of Aspect, Cosine of Aspect, Normal slope line curvature, Normal contour curvature, Contour torsion, Contour change of normal contour curvature, Slope line change of normal contour curvature,  Slope line change of normal slope line curvature) using `lsp_calculator`.
--   Processes the generated rasters using `raster_tools` to crop boundaries, normalize curvature values using arctan trasnformation, and rescale values to a standard range (0-255).
+-   Processes the generated rasters using `raster_tools` to crop boundaries, normalize curvature values using arctan transformation, and rescale values to a standard range (0-255).
 -   The processed LSP rasters are saved into a `LSP\for_seg` subdirectory at the same location as input DEM.
 
 #### Usage
