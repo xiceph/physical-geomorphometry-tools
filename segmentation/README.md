@@ -79,9 +79,9 @@ python segment_dem.py \
 
 -   **Linux**: The scripts are developed and tested for a Linux environment.
 -   **Windows**: The scripts can be adapted for Windows, provided that:
-    1.  You have Windows-compatible versions of `lsp_calculator` and `raster_tool` installed and available in your PATH.
-    2.  You use Windows-style paths when running `process_dem.py`.
-    3.  Trimble eCognition docker for Windows is installed and configured correctly. Note that the paths passed to `segment_dem.py` must be in the Windows-style format that the container expects.
+    -  You have Windows-compatible versions of `lsp_calculator` and `raster_tool` installed and available in your PATH.
+    -  You use Windows-style paths when running `process_dem.py`.
+    -  Trimble eCognition docker for Windows is installed and configured correctly. Note that the paths passed to `segment_dem.py` must be in the Windows-style format that the container expects.
 
 ### Examples
 
@@ -101,5 +101,8 @@ python3 segment_dem.py --img_dir /mnt/img_data/sample_project/LSP/for_seg \
 --results_dir /mnt/results/sample_project --sp 150 \
 --import_tmpl_file /mnt/import_dem_seg.xml --ruleset /mnt/dem_seg.dcp
 ```
+## License
+
+This project is licensed under the MIT License.
 
 [^1]: Minár, J., Drăguţ, L., Evans, I. S., Feciskanin, R., Gallay, M., Jenčo, M., & Popov, A. (2024). Physical geomorphometry for elementary land surface segmentation and digital geomorphological mapping. Earth-Science Reviews, 248, 104631. https://doi.org/10.1016/J.EARSCIREV.2023.104631
