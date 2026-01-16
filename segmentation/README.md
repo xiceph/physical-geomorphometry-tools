@@ -21,7 +21,7 @@ Before using this workflow, ensure you have the following software installed and
 
 *   **Python 3**: For running the scripts.
 *   **`lsp_calculator`**: A command-line tool for calculating land surface parameters. This tool must be installed and accessible in your system's PATH.
-*   **`raster_tool`**: A command-line tool for raster manipulation. This tool must be installed and accessible in your system's PATH.
+*   **`raster_tools`**: A command-line tool for raster manipulation. This tool must be installed and accessible in your system's PATH.
 *   **Docker**: For running the eCognition command-line engine.
 *   **Trimble eCognition Server**: You must have a valid eCognition Server license and an instance of the eCognition Command Line Engine (`ecognition-cle`) running in a Docker container.
 
@@ -33,7 +33,7 @@ Before using this workflow, ensure you have the following software installed and
 
 This script performs the following actions:
 -   Calculates a suite of LSPs for land surface segmentation (Sine of Slope, Sine of Aspect, Cosine of Aspect, Normal slope line curvature, Normal contour curvature, Contour torsion, Contour change of normal contour curvature, Slope line change of normal contour curvature,  Slope line change of normal slope line curvature) using `lsp_calculator`.
--   Processes the generated rasters using `raster_tool` to crop boundaries, normalize curvature values using arctan trasnformation, and rescale values to a standard range (0-255).
+-   Processes the generated rasters using `raster_tools` to crop boundaries, normalize curvature values using arctan trasnformation, and rescale values to a standard range (0-255).
 -   The processed LSP rasters are saved into a `LSP\for_seg` subdirectory at the same location as input DEM.
 
 #### Usage
