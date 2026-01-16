@@ -65,7 +65,7 @@ python segment_dem.py \
     --import_tmpl_file /mnt/import_dem_seg.xml \
     --ruleset /mnt/dem_seg.dcp
 ```
-### Required arguments
+### Command-Line Arguments (Required)
 
 | Argument                | Description                                                                                                     |
 | :---------------------- | :-------------------------------------------------------------------------------------------------------------- |
