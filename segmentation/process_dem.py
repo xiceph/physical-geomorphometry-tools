@@ -20,7 +20,7 @@ def run_command(command):
 
 def calculate_LSPs(input_raster):
     """
-    Calculates Land Surface Parameters (LSPs) for segmentation from input DEM TIF file. Prior generalization of DEM is recommended.
+    Calculates Land Surface Parameters (LSPs) for elementary land surface segmentation from input DEM TIF file. Prior generalization of DEM is recommended.
     LSP rasters are then adjusted to achieve better segmentation results. At first, all LSP rasters are clipped by 1px on each side to prevent undefined parameter values. The curvature rasters are transformed to approximate a normal distribution. Finally, the rasters are rescaled to a range of 0-255 for standardization.
     Requires lsp_calculator and raster_tool installed.
     Final LSP rasters are saved to the directory LSP/for_seg in base directory of the input DEM file.
@@ -48,7 +48,7 @@ def calculate_LSPs(input_raster):
     ]
     run_command(lsp_command)
 
-    # Process LSPs with raster_tool
+    # Process LSPs with raster_tools
     lsp_files = glob.glob(os.path.join(out_dir, "*.tif"))
     for lsp_file in lsp_files:
         basename = os.path.basename(lsp_file)
@@ -85,15 +85,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    # Part 1: Process TIFs
-    # The output of this function is the directory to be processed by the next step.
-    # However, the docker command in the second part seems to take the parent of the "final" directory.
-    # The original script's logic for process_dem_seg uses the directory containing the "final" directory
-    # let's get the parent of the final_dir
-
-    #final_dir = calculate_LSPs(args.input_raster)
     calculate_LSPs(args.input_raster)
-    #processing_dir = os.path.dirname(final_dir)
     
     print("Processing complete.")
 
