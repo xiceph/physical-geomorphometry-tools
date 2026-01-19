@@ -1,19 +1,18 @@
-# Physically-based land surface segmentation
+# Physically-based elementary land surface segmentation
 
 ## Overview
 
-`Physically-based land surface segmentation` provides a two-step command-line workflow to produce meaningful land surface objects from an elevation raster (DEM - Digital Elevation Model).
-The process involves calculating land surface parameters (LSPs) from a DEM and then perform land surface segmentation based on these parameters using Trimble eCognition server. Alternatively, user can perform segmentation in eCognition Developer software on his own desktop machine.
+`Physically-based elementary land surface segmentation` provides a two-step command-line workflow to produce meaningful elementary land surface objects from an elevation raster (DEM - Digital Elevation Model). The process involves calculating Land Surface Parameters (LSPs) from a DEM and then perform elementary land surface segmentation based on these parameters using Trimble eCognition server. Alternatively, user can perform segmentation in eCognition Developer software on his own desktop machine.
 
 This tools are part of the larger **physical-geomorphometry** project, which focuses on physically based methods for analyzing landforms and land surface dynamics. It builds on the other parts of the project by allowing the creation of meaningful land surface segments based on a generalized DEM raster.
 
 For further details, please refer to the article _Physical geomorphometry for elementary land surface segmentation and digital geomorphological mapping_ by Minár et al. (2024)[^1].
 
 The procedure consists of two steps:
-1. **Calculating of the land surface parameters for segmentation**:
-   A python script `process_dem.py` takes a DEM raster and generates LSPs optimized for land surface segmentation.
-3. **Performing land surface segmentation**:
-   A python script `segment_dem.py` takes the LSPs and uses an eCognition Server running in a Docker container to perform land surface segmentation and export the results as a shapefile.
+1. **Calculating the land surface parameters for segmentation**:
+   A python script `process_dem.py` takes a DEM raster and generates LSPs optimized for elementary land surface segmentation.
+3. **Performing the elementary land surface segmentation**:
+   A python script `segment_dem.py` takes the LSPs and uses an eCognition Server running in a Docker container to perform elementary land surface segmentation and export the results as a shapefile.
 
 ## Prerequisites
 
@@ -27,12 +26,12 @@ Before using this workflow, ensure you have the following software installed and
 
 ## Workflow steps
 
-### Step 1: Calculate LSPs for land surface segmentation
+### Step 1: Calculate LSPs for segmentation
 
 **Script:** `process_dem.py`
 
 This script performs the following actions:
--   Calculates a suite of LSPs for land surface segmentation (Sine of Slope, Sine of Aspect, Cosine of Aspect, Normal slope line curvature, Normal contour curvature, Contour torsion, Contour change of normal contour curvature, Slope line change of normal contour curvature,  Slope line change of normal slope line curvature) using `lsp_calculator`.
+-   Calculates a suite of LSPs for elementary land surface segmentation (Sine of Slope, Sine of Aspect, Cosine of Aspect, Normal slope line curvature, Normal contour curvature, Contour torsion, Contour change of normal contour curvature, Slope line change of normal contour curvature,  Slope line change of normal slope line curvature) using `lsp_calculator`.
 -   Processes the generated rasters using `raster_tools` to crop boundaries, normalize curvature values using arctan transformation, and rescale values to a standard range (0-255).
 -   The processed LSP rasters are saved into a `LSP\for_seg` subdirectory at the same location as input DEM.
 
@@ -42,7 +41,7 @@ This script performs the following actions:
 python process_dem.py /path/to/your/input_dem.tif
 ```
 
-### Step 2: Perform land surface segmentation
+### Step 2: Perform elementary land surface segmentation
 
 **Script:** `segment_dem.py`
 
@@ -87,14 +86,14 @@ python segment_dem.py \
 
 #### 1. Calculate LSPs for segmentation.
 
-This command calculates LSPs for land surface segmentation using DEM, processes the LSPs using raster_tool and saves the output to `LSP\for_seg` subdirectory at the same location as input DEM.
+This command calculates LSPs for elementary land surface segmentation using DEM, processes the LSPs using raster_tool and saves the output to `LSP\for_seg` subdirectory at the same location as input DEM.
 
 ```bash
 python3 process_dem.py dem.tif
 ```
-#### 2. Perform land surface segmentation.
+#### 2. Perform elementary land surface segmentation.
 
-This command executes land surface segmentation based on predefined import template and predefined ruleset, with scale parameter 150. It uses Trimble eCognition server via command-line engine in docker container. The final shapefile is saved in directory `/mnt/results/sample_project`.
+This command executes elementary land surface segmentation based on predefined import template and predefined ruleset, with scale parameter 150. It uses Trimble eCognition server via command-line engine in docker container. The final shapefile is saved in directory `/mnt/results/sample_project`.
 
 ```bash
 python3 segment_dem.py --img_dir /mnt/img_data/sample_project/LSP/for_seg \
