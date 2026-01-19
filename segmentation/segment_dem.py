@@ -20,20 +20,14 @@ def run_command(command):
 
 def process_dem_seg(img_dir, results_dir, sp, import_tmpl_file, ruleset):
     """
-    Executes multiresolution segmentation of LSPs on the eCognition server and exports the results into shapefile.
+    Performs physically-based elementary land surface segmentation using land surface parameters (LSPs).
+    The function executes multiresolution segmentation of LSPs on the eCognition server and exports the results into shapefile.
     The size of the segments can be influenced by the scale parameter (the larger the value, the larger the objects).
     Requires Trimble eCognition server license and eCognition command line engine in docker installed.
     Ruleset file dem_seg.dcp, import template import_dem_seg.xml and input LSP rasters must be placed in the correct location for the docker container to access them (directory mounted in docker container).
     Paths to input image directory, results directory, import template file and ruleset must be defined relative to docker container filesystem.
 
     """
-    #dir_name = os.path.basename(input_dir)
-    #img_dir = os.path.join(container_path, dir_name)
-    #output_dir = os.path.join(base_results_dir, dir_name)
-
-    # The original script does mkdir -p, but then comments it out.
-    # We will ensure the directory exists.
-    # os.makedirs(output_dir, exist_ok=True)
 
     docker_command = [
         "docker", "exec", "-it", "ecognition-cle",
@@ -58,31 +52,6 @@ if __name__ == "__main__":
     parser.add_argument("--ruleset", default="/mnt/dem_seg.dcp", help="Ruleset for physically-based DEM segmentation and export to shapefile.")
 
     args = parser.parse_args()
-
-
-    # Part 2: Process with Docker
-    # The process_dem_seg.sh script seems to have hardcoded paths, which we now
-    # pass as arguments. The `input_dir` for process_dem_seg should be `processing_dir`.
-    # Based on the shell script, the docker command constructs paths inside the container
-    # so we need to pass the correct directory names.
-    #dir_name = os.path.basename(processing_dir)
-
-    # We need to make sure the directory structure matches what the docker command expects.
-    # The docker command uses `image-dir=$IMG_DIR/$dir_name`.
-    # Let's check how the paths are constructed.
-    # The `process_tifs` created `for_seg/<prefix>/final`.
-    # The `process_dem_seg` script seems to expect a directory structure like `/mnt/img_data/<dir_name>`.
-    # It appears that the output of the first script needs to be in a location accessible
-    # to the docker container, under the path specified by --img_dir.
-
-    # For simplicity, this script will just call the docker command with the
-    # directory name, assuming the user has placed the processed files in the correct
-    # location for the docker container to access them.
-
-    # The `input_dir` for `process_dem_seg` is the directory name that will be appended to `img_dir_base`.
-    # In `process_dem_seg.sh`, `dir_name` is `basename "$dir_path"`.
-    # `dir_path` is like `$BASE_DIR/*`.
-    # In our case, the equivalent of `$dir_path` is `processing_dir`.
 
     process_dem_seg(
         img_dir=args.img_dir,
