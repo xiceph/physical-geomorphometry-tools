@@ -1,8 +1,10 @@
-# Physically-based elementary land surface segmentation
+# Segmentation
 
-## Overview
+## Physically-based elementary land surface segmentation
 
-`Physically-based elementary land surface segmentation` provides a two-step command-line workflow to produce meaningful elementary land surface objects from an elevation raster (DEM - Digital Elevation Model). The process involves calculating Land Surface Parameters (LSPs) from a DEM and then perform elementary land surface segmentation based on these parameters using Trimble eCognition server. Alternatively, user can perform segmentation in eCognition Developer software on his own desktop machine.
+### Overview
+
+`Segmentation` is a tool for performing physically-based elementary land surface segmentation. It provides a two-step command-line workflow to produce meaningful elementary land surface objects from an elevation raster (DEM - Digital Elevation Model). The process involves calculating Land Surface Parameters (LSPs) from a DEM and then perform elementary land surface segmentation based on these parameters using Trimble eCognition server. Alternatively, user can perform segmentation in eCognition Developer software on his own desktop machine.
 
 This tools are part of the larger **physical-geomorphometry** project, which focuses on physically based methods for analyzing landforms and land surface dynamics. It builds on the other parts of the project by allowing the creation of meaningful land surface segments based on a generalized DEM raster.
 
@@ -14,7 +16,7 @@ The procedure consists of two steps:
 3. **Performing the elementary land surface segmentation**:
    A python script `segment_dem.py` takes the LSPs and uses an eCognition Server running in a Docker container to perform elementary land surface segmentation and export the results as a shapefile.
 
-## Prerequisites
+### Prerequisites
 
 Before using this workflow, ensure you have the following software installed and configured:
 
@@ -24,9 +26,9 @@ Before using this workflow, ensure you have the following software installed and
 *   **Docker**: For running the eCognition command-line engine.
 *   **Trimble eCognition Server**: You must have a valid eCognition Server license and an instance of the eCognition Command Line Engine (`ecognition-cle`) running in a Docker container.
 
-## Workflow steps
+### Workflow steps
 
-### Step 1: Calculate LSPs for segmentation
+#### Step 1: Calculate LSPs for segmentation
 
 **Script:** `process_dem.py`
 
@@ -41,7 +43,7 @@ This script performs the following actions:
 python process_dem.py /path/to/your/input_dem.tif
 ```
 
-### Step 2: Perform elementary land surface segmentation
+#### Step 2: Perform elementary land surface segmentation
 
 **Script:** `segment_dem.py`
 
@@ -74,7 +76,7 @@ python segment_dem.py \
 | `--import_tmpl_file`    | Path *inside the container* to the eCognition import template XML file.                                         | 
 | `--ruleset`             | Path *inside the container* to the eCognition ruleset (`.dcp`) file.                                            |
 
-## Platform Compatibility
+### Platform Compatibility
 
 -   **Linux**: The scripts are developed and tested for a Linux environment.
 -   **Windows**: The scripts can be adapted for Windows, provided that:
@@ -100,7 +102,7 @@ python3 segment_dem.py --img_dir /mnt/img_data/sample_project/LSP/for_seg \
 --results_dir /mnt/results/sample_project --sp 150 \
 --import_tmpl_file /mnt/import_dem_seg.xml --ruleset /mnt/dem_seg.dcp
 ```
-## License
+### License
 
 This project is licensed under the MIT License.
 
