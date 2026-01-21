@@ -24,7 +24,7 @@ This tool is part of the larger **physical-geomorphometry** project, which focus
 The tool is designed as a pipeline. You provide an input file and an output file, and specify the processing steps to apply.
 
 ```
-raster-tools.exe -i <input.tif> -o <output.tif> [OPTIONS]
+raster_tools.exe -i <input.tif> -o <output.tif> [OPTIONS]
 ```
 
 ### Arguments
@@ -69,7 +69,7 @@ If you want to inspect the result of each step, use the `--keep-temps` flag. Thi
 This command crops 5 pixels from the border of `input.tif`, normalizes the result, and saves the final output to `processed.tif`.
 
 ```sh
-./target/release/raster-tools -i C:\data\input.tif -o C:\data\processed.tif --crop 5 --normalize
+./target/release/raster_tools.exe -i C:\data\input.tif -o C:\data\processed.tif --crop 5 --normalize
 ```
 
 #### 2. Full Pipeline with Intermediate Files
@@ -77,7 +77,7 @@ This command crops 5 pixels from the border of `input.tif`, normalizes the resul
 This command runs all three steps (crop, normalize, rescale) and keeps all the intermediate files for inspection.
 
 ```sh
-./target/release/raster-tools `
+./target/release/raster_tools.exe `
   --input-file "input.tif" `
   --output-file "final_output.tif" `
   --crop 10 `
