@@ -172,20 +172,21 @@ pub struct BlockMetadata {
 /// An iterator that processes a DEM in blocks.
 pub struct BlockProcessor {
     config: Arc<ProcessConfig>,
-    dem_array: Arc<Array2<f64>>,
+    input_path: PathBuf,
     blocks_to_process: Vec<(usize, usize)>,
     pixel_size: f64,
     nodata_value: Option<f64>,
     current_block: usize,
     geo_transform: [f64; 6],
     wkt: Option<String>,
+    dataset_size: (usize, usize),
 }
 
 impl BlockProcessor {
     /// Creates a new BlockProcessor.
     ///
-    /// Initializes the processor by loading the DEM, setting up the thread pool,
-    /// and determining the blocks to be processed.
+    /// Initializes the processor by checking the input DEM metadata, setting up 
+    /// the thread pool, and determining the blocks to be processed.
     ///
     /// # Arguments
     /// * `config` - The `ProcessConfig` containing all processing parameters.
@@ -207,13 +208,7 @@ impl BlockProcessor {
         let pixel_size = (geo_transform[1].abs() + geo_transform[5].abs()) / 2.0;
         let nodata_value = band.no_data_value();
 
-        let dem_data_buffer: Buffer<f64> =
-            band.read_as((0, 0), (width, height), (width, height), None)?;
-        let dem_array = Arc::new(Array2::from_shape_vec(
-            (height, width),
-            dem_data_buffer.data().to_vec(),
-        )?);
-        println!("{} Input DEM loaded successfully ({}x{}).", text::check_icon(), width, height);
+        println!("{} Input DEM metadata loaded ({}x{}).", text::check_icon(), width, height);
 
         let step = config.window_size - config.overlap;
         let n_cols = (width - config.window_size) / step + 1;
@@ -232,14 +227,15 @@ impl BlockProcessor {
         );
 
         Ok(BlockProcessor {
+            input_path: config.input.clone(),
             config: Arc::new(config),
-            dem_array,
             blocks_to_process,
             pixel_size,
             nodata_value,
             current_block: 0,
             geo_transform,
             wkt,
+            dataset_size: (width, height),
         })
     }
 
@@ -284,7 +280,7 @@ impl BlockProcessor {
         let config = &self.config;
         let window_size = config.window_size;
         let taper_width = config.taper_width.unwrap_or(0);
-        let (rows, cols) = self.dem_array.dim();
+        let (cols, rows) = self.dataset_size;
 
         // 1. Initialize Padded Array
         let padded_rows = window_size + 2 * taper_width;
@@ -296,19 +292,53 @@ impl BlockProcessor {
         let pad_r_start = row_start as isize - taper_width as isize;
         let pad_c_start = col_start as isize - taper_width as isize;
 
-        // Iterate and Fill Valid Data
-        for r in 0..padded_rows {
-            for c in 0..padded_cols {
-                let global_r = pad_r_start + r as isize;
-                let global_c = pad_c_start + c as isize;
+        // Open dataset handle locally for this thread.
+        let ds = Dataset::open(&self.input_path)?;
+        let band = ds.rasterband(1)?;
 
-                if global_r >= 0
-                    && global_r < rows as isize
-                    && global_c >= 0
-                    && global_c < cols as isize
-                {
-                    padded_data[[r, c]] = self.dem_array[[global_r as usize, global_c as usize]];
-                    accumulated_weights[[r, c]] = 1.0; // Mark as Real Data
+        // Calculate intersection of padded window and dataset extent
+        let global_r_min = pad_r_start.max(0);
+        let global_r_max = (pad_r_start + padded_rows as isize).min(rows as isize);
+        let global_c_min = pad_c_start.max(0);
+        let global_c_max = (pad_c_start + padded_cols as isize).min(cols as isize);
+
+        if global_r_max > global_r_min && global_c_max > global_c_min {
+            let read_rows = (global_r_max - global_r_min) as usize;
+            let read_cols = (global_c_max - global_c_min) as usize;
+
+            let buffer: Buffer<f64> = band.read_as(
+                (global_c_min as isize, global_r_min as isize),
+                (read_cols, read_rows),
+                (read_cols, read_rows),
+                None,
+            )?;
+
+            let read_data = Array2::from_shape_vec((read_rows, read_cols), buffer.data().to_vec())?;
+
+            // Map read_data into padded_data
+            let local_r_start = (global_r_min - pad_r_start) as usize;
+            let local_c_start = (global_c_min - pad_c_start) as usize;
+
+            let mut data_slice = padded_data.slice_mut(s![
+                local_r_start..local_r_start + read_rows,
+                local_c_start..local_c_start + read_cols
+            ]);
+            data_slice.assign(&read_data);
+
+            let mut weights_slice = accumulated_weights.slice_mut(s![
+                local_r_start..local_r_start + read_rows,
+                local_c_start..local_c_start + read_cols
+            ]);
+            weights_slice.fill(1.0);
+
+            // Handle nodata
+            if let Some(ndv) = self.nodata_value {
+                data_slice.mapv_inplace(|x| if x == ndv { f64::NAN } else { x });
+                // Reset weights where NaN
+                for ((r, c), &val) in data_slice.indexed_iter() {
+                    if val.is_nan() {
+                        weights_slice[[r, c]] = 0.0;
+                    }
                 }
             }
         }
@@ -663,7 +693,7 @@ impl Iterator for BlockProcessor {
         self.current_block += 1;
 
         let block_result = load_block_data(
-            &self.dem_array,
+            &self.input_path,
             row_start,
             col_start,
             self.config.window_size,
@@ -676,10 +706,10 @@ impl Iterator for BlockProcessor {
 
 // --- Public Processing Functions ---
 
-/// Extracts a block of data from the full DEM array.
+/// Extracts a block of data from the DEM file.
 ///
 /// # Arguments
-/// * `dem_array` - The full DEM data as an `Array2<f64>`.
+/// * `input_path` - Path to the input DEM file.
 /// * `row_start` - The starting row index of the block.
 /// * `col_start` - The starting column index of the block.
 /// * `window_size` - The size of the square window (block).
@@ -688,18 +718,23 @@ impl Iterator for BlockProcessor {
 /// # Returns
 /// A `Result` containing the extracted `Block` data.
 pub fn load_block_data(
-    dem_array: &Array2<f64>,
+    input_path: &Path,
     row_start: usize,
     col_start: usize,
     window_size: usize,
     nodata_value: Option<f64>,
 ) -> Result<Block> {
-    let block_view = dem_array.slice(s![
-        row_start..row_start + window_size,
-        col_start..col_start + window_size
-    ]);
+    let ds = Dataset::open(input_path)?;
+    let band = ds.rasterband(1)?;
 
-    let mut data = block_view.to_owned();
+    let buffer: Buffer<f64> = band.read_as(
+        (col_start as isize, row_start as isize),
+        (window_size, window_size),
+        (window_size, window_size),
+        None,
+    )?;
+
+    let mut data = Array2::from_shape_vec((window_size, window_size), buffer.data().to_vec())?;
 
     // Convert nodata values to NaN for consistent handling.
     if let Some(ndv) = nodata_value {
