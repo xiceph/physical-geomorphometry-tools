@@ -10,7 +10,7 @@
 - **Spectral Coherence:** Calculate the magnitude squared coherence to measure the linear correlation and phase consistency between datasets.
 - **Retention Analysis:** Determine the wavelength threshold at which a certain percentage (e.g., 50%) of power is retained.
 - **Resolution Assessment:** Automatically identify the wavelength where coherence drops below a threshold (default 0.5), defining the "effective resolution".
-- **Visualization:** Generate interactive spectral plots (HTML) showing Mean PSD, Ratios, and Coherence.
+- **Visualization:** Generate interactive spectral plots (HTML) comparing the Mean PSD of both datasets (A vs B). This visualization focuses on absolute power levels, distinct from the relative metrics provided in the CSV.
 
 ## Usage
 
@@ -46,7 +46,7 @@ fft-compare --input-a ./results/original --input-b ./results/modified \
 
 1.  **`comparison_summary.csv`**: A global summary containing wavelengths, mean PSDs, mean ratios, and coherence values.
 2.  **`comparison_block_ROW_COL.csv`** (Optional): Partial results for individual blocks if `--save-partials` is used.
-3.  **Spectral Comparison Plot**: An interactive HTML file visualizing the spectral differences.
+3.  **Spectral Comparison Plot**: An interactive HTML file visualizing the mean spectral power of both input datasets (Input A and Input B).
 
 ## Scientific Relevance
 

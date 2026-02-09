@@ -12,6 +12,7 @@ It offers different modes of analysis to collapse the 2D polar spectrum into 1D 
   - **Radial Mean:** Averages power across all angles for each wavenumber bin. Produces a 1D Power vs. Wavelength profile.
   - **Angular Mean:** Averages power across all wavenumbers for each angular bin. Produces a 1D Power vs. Angle (Direction) profile.
 - **Aggregation:** Computes the global mean across all processed blocks to provide a dataset-wide summary.
+- **Log-Log Detrending:** Supports polynomial detrending of radial PSD profiles in log-log space to highlight deviations from a power-law trend (fractal behavior).
 - **Visualization:** Generates interactive HTML plots (using Plotly) or static SVG plots.
 - **CSV Export:** detailed numerical results for further processing in Python or R.
 

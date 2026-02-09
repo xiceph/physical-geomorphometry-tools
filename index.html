@@ -35,19 +35,21 @@
 
         <h3>Geoinformatic Outputs</h3>
         <p>The project aims to develop geoinformatic tools and models for analyzing interconnected physical-geomorphometric characteristics and indices. All developed tools and data will be publicly available in the <a href="https://github.com/xiceph/physical-geomorphometry/">project repository</a>.</p>
-        <p>The project delivers a series of independently usable components that collectively form a comprehensive approach to land surface segmentation. These components include:</p>
+        <p>The project delivers a series of independently usable components that collectively form a comprehensive approach to physical geomorphometry. These components include:</p>
         <ul>
+            <li>Spectral analysis of land surface roughness and anisotropy (FFT).</li>
             <li>Generalization of high-resolution Digital Elevation Models (DEMs) to a highly simplified level.</li>
             <li>Calculation of standard and non-standard Land Surface Parameters (LSPs).</li>
-            <li>Physically based segmentation of the land surface.</li>
+            <li>Physically-based elementary land surface segmentation.</li>
         </ul>
 
         <h3>Software Packages (Tools)</h3>
         <p>Each major topic is addressed through a dedicated software package available in the following subdirectories of the project repository:</p>
         <ul>
-            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/generalization">/generalization</a> – Tool for generalizing DEMs.</li>
-            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/lsp-calculator">/lsp-calculator</a> – Software for the calculation of LSPs.</li>
-            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/segmentation">/segmentation</a> – Implementation of physically based land surface segmentation.</li>
+            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/fft-tools">/fft-tools</a> – A suite of tools for Fast Fourier Transform (FFT) analysis of DEMs.</li>
+            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/generalization">/generalization</a> – Tool for generalizing DEMs using Quadric Error Metrics (QEM).</li>
+            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/lsp-calculator">/lsp-calculator</a> – Software for the calculation of a comprehensive set of local LSPs.</li>
+            <li><a href="https://github.com/xiceph/physical-geomorphometry/tree/main/segmentation">/segmentation</a> – Physically-based elementary land surface segmentation including workflow scripts and preprocessing tools.</li>
         </ul>
 
         <h3>Usage</h3>
