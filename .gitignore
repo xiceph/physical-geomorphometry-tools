@@ -23,3 +23,9 @@ Cargo.lock
 .env
 generalization/app.config
 lsp-calculator/app.config
+
+# Gemini CLI & Local Development
+GEMINI.md
+conductor/
+.env
+

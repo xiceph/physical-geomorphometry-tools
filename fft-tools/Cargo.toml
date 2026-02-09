@@ -1,0 +1,13 @@
+[workspace]
+members = [ "packages/fft-analyze", "packages/fft-compare",
+    "packages/fft-core", "packages/fft-filter", "packages/fft-inverse", "packages/fft-polar",
+    "packages/fft-process",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Richard Feciskanin <richard.feciskanin@uniba.sk>"]
+edition = "2021"
+repository = "https://github.com/xiceph/physical-geomorphometry-tools/tree/main/fft-tools"
+license = "MIT"
