@@ -63,7 +63,7 @@ A typical analysis pipeline might look like this:
     ./target/release/fft-filter --input ./results/fft --output ./results/filtered --min-wavelength 50
 
     # Inverse FFT to get the filtered DEM
-    ./target/release/fft-inverse --input ./results/filtered --output filtered_dem.tif --remove-padding
+    ./target/release/fft-inverse --input ./results/filtered --output filtered_dem.tif
     ```
 
 ## License

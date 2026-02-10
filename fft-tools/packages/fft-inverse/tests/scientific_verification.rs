@@ -51,7 +51,6 @@ fn test_round_trip_accuracy() {
     let mut cmd = Command::cargo_bin("fft-inverse").unwrap();
     cmd.arg("--input").arg(&input_dir)
        .arg("--output").arg(&output_file)
-       .arg("--remove-padding")
        .assert()
        .success();
 

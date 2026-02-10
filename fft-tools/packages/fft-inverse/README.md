@@ -24,16 +24,16 @@ fft-inverse [OPTIONS] --input <DIR> --output <FILE>
 - `--output <FILE>`: Path to the output reconstructed GeoTIFF.
 
 #### Optional Arguments
-- `--remove-padding`: Restore the original block dimensions by removing padding. **Strongly Recommended** for final output. Default is `false`.
+- `--no-remove-padding`: If set, padding will NOT be removed from the reconstructed blocks. By default, padding is automatically removed to restore original dimensions.
 - `--no-reapply-trend`: Do NOT add the original trend back to the data. Use this if you want to analyze the roughness/residuals only. Default is `false`.
 - `--jobs <NUM>`: Number of parallel jobs to run. Defaults to 0 (all available cores).
 
 ### Example
 
-Reconstruct a filtered DEM, removing padding and restoring the trend:
+Reconstruct a filtered DEM, automatically removing padding and restoring the trend:
 
 ```bash
-fft-inverse --input ./results/filtered --output reconstructed_dem.tif --remove-padding
+fft-inverse --input ./results/filtered --output reconstructed_dem.tif
 ```
 
 ## Output

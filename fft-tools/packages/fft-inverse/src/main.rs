@@ -29,9 +29,9 @@ struct Args {
     #[arg(long)]
     output: PathBuf,
 
-    /// If set, padding is removed to restore the original dimensions.
+    /// If set, padding will NOT be removed from the reconstructed blocks.
     #[arg(long)]
-    remove_padding: bool,
+    no_remove_padding: bool,
 
     /// If set, the original trend will NOT be reapplied to the inverse FFT result.
     #[arg(long)]
@@ -64,7 +64,7 @@ fn main() -> Result<()> {
     println!("{} Configuration:", text::bold("Reconstruction"));
     println!("  {:<20} {}", "Input Directory:", args.input.display());
     println!("  {:<20} {}", "Output File:", args.output.display());
-    println!("  {:<20} {}", "Remove Padding:", args.remove_padding);
+    println!("  {:<20} {}", "Remove Padding:", !args.no_remove_padding);
     println!("  {:<20} {}", "Re-apply Trend:", !args.no_reapply_trend);
     println!(
         "  {:<20} {}",
@@ -130,7 +130,7 @@ fn main() -> Result<()> {
     let processed_blocks: Vec<Result<(Array2<f64>, usize, usize)>> = metadata_paths
         .par_iter()
         .map(|path| {
-            let res = process_block(path, args.remove_padding, args.no_reapply_trend);
+            let res = process_block(path, args.no_remove_padding, args.no_reapply_trend);
             
             let mut count = progress_counter.lock().unwrap();
             *count += 1;
@@ -173,7 +173,7 @@ fn main() -> Result<()> {
     let _ = term.clear_line();
     println!("\r{} Blocks stitched seamlessly.", text::check_icon());
 
-    let final_geo_transform = if !args.remove_padding {
+    let final_geo_transform = if args.no_remove_padding {
         if let Some(mut gt) = output_geo_transform {
             let (original_rows, original_cols) = first_metadata.original_size;
             let (padded_rows, padded_cols) = first_metadata.padded_size;
@@ -211,7 +211,7 @@ fn main() -> Result<()> {
 
 fn process_block(
     metadata_path: &Path,
-    remove_padding: bool,
+    no_remove_padding: bool,
     no_reapply_trend: bool,
 ) -> Result<(Array2<f64>, usize, usize)> {
     let metadata_str = fs::read_to_string(metadata_path)
@@ -276,7 +276,7 @@ fn process_block(
     let n_elements = (padded_rows * padded_cols) as f64;
     let real_part = ifft_result.mapv(|c| c.re / n_elements);
 
-    if remove_padding {
+    if !no_remove_padding {
         let (original_rows, original_cols) = metadata.original_size;
         let r_start = (padded_rows - original_rows) / 2;
         let c_start = (padded_cols - original_cols) / 2;
