@@ -160,7 +160,7 @@ pub fn process_side_blocks(
                 // --- Subsample control points for performance ---
                 let mut control_points = Vec::new();
                 let mut control_values = Vec::new();
-                let mut control_lambdas = Vec::new();
+                let mut control_alphas = Vec::new();
 
                 for ((r_local, c_local), &val) in control_slice.indexed_iter() {
                     // Distance from the inner edge (boundary with the rest of the data).
@@ -204,9 +204,9 @@ pub fn process_side_blocks(
                         // Tighter constraint on the boundary AND the first gradient row
                         // to strongly lock the trend near the edge.
                         if dist_from_inner_edge <= base_stride {
-                            control_lambdas.push(1e-9);
+                            control_alphas.push(1e-9);
                         } else {
-                            control_lambdas.push(1e-6);
+                            control_alphas.push(1e-6);
                         }
                     }
                 }
@@ -228,7 +228,7 @@ pub fn process_side_blocks(
                 let weights = fit_tps(
                     &control_points,
                     &control_values,
-                    &control_lambdas,
+                    &control_alphas,
                     Some(cache_key),
                 )?;
 
@@ -653,7 +653,7 @@ fn mirror_and_taper_residuals(
 /// # Arguments
 /// * `points` - A vector of `(x, y)` coordinates for the control points.
 /// * `values` - A vector of `z` values at the control points.
-/// * `lambdas` - A vector of regularization parameters for each point.
+/// * `alphas` - A vector of regularization parameters for each point.
 ///   Smaller values enforce tighter interpolation.
 /// * `cache_key` - Optional key to identify the block geometry for caching the LU decomposition.
 ///
@@ -662,14 +662,14 @@ fn mirror_and_taper_residuals(
 fn fit_tps(
     points: &[(f64, f64)],
     values: &[f64],
-    lambdas: &[f64],
+    alphas: &[f64],
     cache_key: Option<TPSKey>,
 ) -> Result<DVector<f64>> {
     let n = points.len();
     if n == 0 {
         return Err(anyhow!("Cannot fit TPS with zero points."));
     }
-    if lambdas.len() != n {
+    if alphas.len() != n {
         return Err(anyhow!(
             "Mismatch between number of points and regularization parameters."
         ));
@@ -708,7 +708,7 @@ fn fit_tps(
     }
     // Add variable regularization to the diagonal of K.
     for i in 0..n {
-        l_matrix[(i, i)] += lambdas[i];
+        l_matrix[(i, i)] += alphas[i];
     }
 
     // Build P matrix (top-right, n x 3)
