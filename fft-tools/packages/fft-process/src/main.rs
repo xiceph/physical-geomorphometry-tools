@@ -35,9 +35,9 @@ struct Args {
     /// Size of the square window (block) to process, in pixels. If omitted, defaults to the smaller dimension of the input raster.
     #[arg(long)]
     window_size: Option<usize>,
-    /// Overlap between adjacent windows, in pixels.
+    /// Overlap between adjacent windows, in pixels. If omitted, defaults to 50% of the window size.
     #[arg(long)]
-    overlap: usize,
+    overlap: Option<usize>,
     /// Optional: Apply detrending. Specify order (1 or 2). If no order, defaults to 1.
     #[arg(long, num_args(0..=1))]
     detrend: Option<Option<usize>>,
@@ -102,6 +102,11 @@ fn main() -> Result<()> {
         None => dem_width.min(dem_height),
     };
 
+    let final_overlap = match args.overlap {
+        Some(o) => o.min(final_window_size - 1), // Clamp to window_size - 1 to avoid infinite loop
+        None => final_window_size / 2,
+    };
+
     let taper_width_config = match args.taper {
         Some(Some(width)) => Some(width),
         Some(None) => Some(final_window_size / 10), // Default to 1/10 of window_size
@@ -113,7 +118,7 @@ fn main() -> Result<()> {
         input: args.input.clone(),   // Clone to move into config, args.input is used again later
         output: args.output.clone(), // Clone to move into config
         window_size: final_window_size,
-        overlap: args.overlap,
+        overlap: final_overlap,
         detrend: detrend_config,
         hann_window: if args.taper_type == TaperType::Inner {
             taper_width_config

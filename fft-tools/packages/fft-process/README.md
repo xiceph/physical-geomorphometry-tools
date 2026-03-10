@@ -22,16 +22,16 @@ This tool solves the problem of analyzing large DEMs that do not fit into memory
 ### Command Line Arguments
 
 ```bash
-fft-process [OPTIONS] --input <FILE> --output <DIR> --overlap <PIXELS>
+fft-process [OPTIONS] --input <FILE> --output <DIR>
 ```
 
 #### Required Arguments
 - `--input <FILE>`: Path to the input DEM (GeoTIFF).
 - `--output <DIR>`: Directory where the output files will be saved.
-- `--overlap <PIXELS>`: The size of the overlap between adjacent blocks in pixels.
 
 #### Optional Arguments
 - `--window-size <PIXELS>`: The size of the square processing block (N x N). If omitted, uses the smaller dimension of the input raster.
+- `--overlap <PIXELS>`: The size of the overlap between adjacent blocks in pixels. Defaults to 50% of the window size.
 - `--detrend <ORDER>`: Apply polynomial detrending to each block. `1` for linear (planar), `2` for quadratic. If the flag is omitted, no detrending is performed. If the flag is provided without an order, it defaults to `1`.
 - `--taper-type <TYPE>`: `inner` (standard window) or `outer` (tapered padding). Default is `outer`.
 - `--taper <WIDTH>`: Width of the taper in pixels. Defaults to 1/10th of the window size.
