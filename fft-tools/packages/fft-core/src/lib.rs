@@ -121,6 +121,7 @@ pub struct FFTResult {
     pub frequencies_y: Array1<f64>,
     pub row_start: usize,
     pub col_start: usize,
+    pub original_size: (usize, usize),
 }
 
 /// Holds the result of a polar transformation of the power spectrum.
@@ -1072,11 +1073,15 @@ pub fn apply_zero_padding(
 
 /// Computes the 2D Fast Fourier Transform of the data and calculates Power Spectral Density (PSD).
 ///
+/// This implementation uses a physically-correct normalization such that the 
+/// sum of the PSD multiplied by the frequency area equals the spatial variance.
+///
 /// # Arguments
-/// * `data` - The input `Array2<f64>` data.
-/// * `pixel_size` - The physical size of a pixel in the spatial domain.
+/// * `data` - The input `Array2<f64>` data (possibly padded).
+/// * `pixel_size` - The physical size of a pixel (assumed isotropic for frequency bins).
 /// * `row_start` - The starting row of the block (for metadata).
 /// * `col_start` - The starting column of the block (for metadata).
+/// * `original_size` - The dimensions (rows, cols) of the original unpadded DEM block.
 ///
 /// # Returns
 /// A `Result` containing an `FFTResult` struct with the complex spectrum, PSD, and frequencies.
@@ -1085,6 +1090,7 @@ pub fn compute_fft(
     pixel_size: f64,
     row_start: usize,
     col_start: usize,
+    original_size: (usize, usize),
 ) -> Result<FFTResult> {
     let (rows, cols) = data.dim();
     let mut complex_data: Array2<Complex<f64>> = data.mapv(|v| Complex::new(v, 0.0));
@@ -1110,12 +1116,11 @@ pub fn compute_fft(
     complex_data = contig_transposed.t().to_owned();
 
     // Calculate Power Spectral Density (PSD).
-    // We normalize by the square of the number of elements (N^2). 
-    // This choice ensures that the sum of all PSD elements equals the mean of the 
-    // squared spatial signal (Mean Power), satisfying Parseval's theorem for this 
-    // specific implementation of the Discrete Fourier Transform.
-    let n_elements = (rows * cols) as f64;
-    let mut power_spectral_density = complex_data.mapv(|c| c.norm_sqr() / n_elements.powi(2));
+    // Physical Normalization: PSD = |Z|^2 * (dx * dy) / (Nx_orig * Ny_orig)
+    // This ensures that: Σ PSD * dkx * dky = Variance
+    let pixel_area = pixel_size.powi(2);
+    let n_original = (original_size.0 * original_size.1) as f64;
+    let mut power_spectral_density = complex_data.mapv(|c| c.norm_sqr() * pixel_area / n_original);
 
     // Shift zero-frequency component to the center.
     // This is essential for isotropic analysis (polar transformation) and makes 
@@ -1136,6 +1141,7 @@ pub fn compute_fft(
         frequencies_y: Array1::from_vec(freqs_y),
         row_start,
         col_start,
+        original_size,
     })
 }
 

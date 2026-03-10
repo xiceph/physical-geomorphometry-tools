@@ -262,7 +262,7 @@ fn main() -> Result<()> {
             }
 
             // Compute the 2D FFT.
-            let fft_result = compute_fft(&final_data, pixel_size, row_start, col_start)?;
+            let fft_result = compute_fft(&final_data, pixel_size, row_start, col_start, original_size)?;
 
             // --- Statistics and Validation ---
             stats.total_power = fft_result.power_spectrum.sum();

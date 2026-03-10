@@ -22,7 +22,7 @@ fn test_round_trip_accuracy() {
 
     // 1. Manually compute FFT and save like fft-process would
     // We use fft-core directly to generate the mock data
-    let fft_result = fft_core::compute_fft(&data, 1.0, 0, 0).unwrap();
+    let fft_result = fft_core::compute_fft(&data, 1.0, 0, 0, (size, size)).unwrap();
     
     // Save complex bin
     let bin_path = input_dir.join("fft_complex_block_0_0.bin");
