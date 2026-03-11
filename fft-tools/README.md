@@ -9,7 +9,9 @@ Unlike monolithic software, this toolkit follows the Unix philosophy: it provide
 The toolkit addresses common challenges in geospatial FFT analysis, such as:
 - **Large Dataset Handling:** Efficient block-based processing to handle DEMs larger than available memory.
 - **Edge Effects:** Configurable windowing (tapering) and padding strategies to minimize spectral leakage.
-- **Physical Correctness:** Area-weighted polar transformations to ensure conservation of power when converting 2D spectra to 1D radial profiles.
+- **Physical Correctness:** 
+    - **2D PSD Normalization:** Implements physically-correct normalization ([m^4]) ensuring that the integral of the PSD equals the spatial variance of the terrain, and that PSD values remain independent of the FFT padding width.
+    - **Polar Transformation:** Area-weighted polar transformations to ensure conservation of power when converting 2D spectra to 1D radial profiles.
 
 ## Tools
 

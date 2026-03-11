@@ -63,4 +63,4 @@ The vertical axis represents the radial component (wavelength), with values incr
 - A horizontal "stripe" in the polar plot indicates a dominant characteristic scale present across multiple directions.
 
 ### Jacobian Correction
-The use of area-weighted normalization is critical. Without it, bins at higher frequencies (shorter wavelengths at the bottom) would appear artificially powerful simply because they cover a larger area in the Cartesian frequency plane. `fft-polar` ensures that the power density remains physically meaningful across all scales.
+The use of area-weighted normalization is critical. Without it, bins at higher frequencies (shorter wavelengths at the bottom) would appear artificially powerful simply because they cover a larger area in the Cartesian frequency plane. `fft-polar` ensures that the power density remains physically meaningful ([m^4]) across all scales, correctly reflecting the distribution of topographic variance per unit area in frequency space.

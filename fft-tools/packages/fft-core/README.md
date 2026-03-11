@@ -10,14 +10,15 @@ This crate is not intended to be run directly but is a dependency for all other 
 
 ### Data Structures
 - **`ProcessConfig`**: A centralized configuration struct that holds parameters for window size, overlap, tapering, and file paths.
-- **`BlockMetadata`**: A serializable struct that stores essential information about each processed block (position, size, statistics, geotransform).
+- **`BlockMetadata`**: A serializable struct that stores essential information about each processed block (position, size, statistics, geotransform, and normalization details).
+- **`PSDNormalizationMetadata`**: Contains parameters used for physically scaling the PSD (original block dimensions and pixel spacing).
 - **`FFTResult`**: A container for the outputs of a single block's FFT operation (power spectrum, complex spectrum).
 
 ### Algorithms
-- **`BlockProcessor`**: The engine responsible for iterating over a large raster dataset in chunks, handling spatial referencing and data loading.
+- **`BlockProcessor`**: The engine responsible for iterating over a large raster dataset in chunks, handling spatial referencing and data loading (including anisotropic pixel sizes).
 - **Tapering & Padding**: Functions for applying Hann windows (`apply_hann_window`) and zero-padding (`apply_zero_padding`).
 - **Detrending**: Least-squares fitting and removal of 1st and 2nd-order polynomial surfaces.
-- **FFT Utilities**: Wrappers around `RustFFT`, plus helper functions like `fftshift` (1D and 2D) and frequency frequency generation (`fftfreq`).
+- **FFT Utilities**: Wrappers around `RustFFT`, implementing physically-correct PSD normalization: `PSD(k_x, k_y) = |Z(k_x, k_y)|^2 * (Δx * Δy) / (N_x * N_y)`. This ensures that the integral of the spectrum equals the spatial variance and remains independent of FFT padding. Includes helper functions like `fftshift` (1D and 2D) and frequency generation (`fftfreq`).
 
 ### I/O
 - **GDAL Integration**: Utilities for reading DEMs and writing GeoTIFFs (`save_gdal_raster`).
