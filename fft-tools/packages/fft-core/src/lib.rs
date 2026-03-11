@@ -152,6 +152,15 @@ pub struct BlockStatistics {
     pub residual_mean: f64,
 }
 
+/// Metadata describing the physical normalization of the PSD.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PSDNormalizationMetadata {
+    pub original_block_size: (usize, usize),
+    pub pixel_size_x: f64,
+    pub pixel_size_y: f64,
+    pub psd_normalization: String,
+}
+
 /// Struct for serializing block metadata to a JSON file.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BlockMetadata {
@@ -164,6 +173,8 @@ pub struct BlockMetadata {
     pub geo_transform: Option<[f64; 6]>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wkt: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub normalization: Option<PSDNormalizationMetadata>,
     pub processing_params: serde_json::Value,
     pub statistics: serde_json::Value,
 }
@@ -175,7 +186,8 @@ pub struct BlockProcessor {
     config: Arc<ProcessConfig>,
     input_path: PathBuf,
     blocks_to_process: Vec<(usize, usize)>,
-    pixel_size: f64,
+    pixel_size_x: f64,
+    pixel_size_y: f64,
     nodata_value: Option<f64>,
     current_block: usize,
     geo_transform: [f64; 6],
@@ -206,7 +218,10 @@ impl BlockProcessor {
         let (width, height) = (ds.raster_size().0, ds.raster_size().1);
         let geo_transform = ds.geo_transform()?;
         let wkt = ds.spatial_ref()?.to_wkt().ok();
-        let pixel_size = (geo_transform[1].abs() + geo_transform[5].abs()) / 2.0;
+        
+        let pixel_size_x = geo_transform[1].abs();
+        let pixel_size_y = geo_transform[5].abs();
+        
         let nodata_value = band.no_data_value();
 
         println!("{} Input DEM metadata loaded ({}x{}).", text::check_icon(), width, height);
@@ -231,7 +246,8 @@ impl BlockProcessor {
             input_path: config.input.clone(),
             config: Arc::new(config),
             blocks_to_process,
-            pixel_size,
+            pixel_size_x,
+            pixel_size_y,
             nodata_value,
             current_block: 0,
             geo_transform,
@@ -240,9 +256,14 @@ impl BlockProcessor {
         })
     }
 
-    /// Returns the pixel size of the DEM.
-    pub fn pixel_size(&self) -> f64 {
-        self.pixel_size
+    /// Returns the pixel dimensions (x, y) of the DEM.
+    pub fn pixel_size_xy(&self) -> (f64, f64) {
+        (self.pixel_size_x, self.pixel_size_y)
+    }
+
+    /// Returns the mean pixel size of the DEM.
+    pub fn pixel_size_mean(&self) -> f64 {
+        (self.pixel_size_x + self.pixel_size_y) / 2.0
     }
 
     /// Returns a clone of the Arc-wrapped configuration.
@@ -1078,7 +1099,8 @@ pub fn apply_zero_padding(
 ///
 /// # Arguments
 /// * `data` - The input `Array2<f64>` data (possibly padded).
-/// * `pixel_size` - The physical size of a pixel (assumed isotropic for frequency bins).
+/// * `pixel_size_x` - The physical size of a pixel in the X direction.
+/// * `pixel_size_y` - The physical size of a pixel in the Y direction.
 /// * `row_start` - The starting row of the block (for metadata).
 /// * `col_start` - The starting column of the block (for metadata).
 /// * `original_size` - The dimensions (rows, cols) of the original unpadded DEM block.
@@ -1087,7 +1109,8 @@ pub fn apply_zero_padding(
 /// A `Result` containing an `FFTResult` struct with the complex spectrum, PSD, and frequencies.
 pub fn compute_fft(
     data: &Array2<f64>,
-    pixel_size: f64,
+    pixel_size_x: f64,
+    pixel_size_y: f64,
     row_start: usize,
     col_start: usize,
     original_size: (usize, usize),
@@ -1118,7 +1141,7 @@ pub fn compute_fft(
     // Calculate Power Spectral Density (PSD).
     // Physical Normalization: PSD = |Z|^2 * (dx * dy) / (Nx_orig * Ny_orig)
     // This ensures that: Σ PSD * dkx * dky = Variance
-    let pixel_area = pixel_size.powi(2);
+    let pixel_area = pixel_size_x * pixel_size_y;
     let n_original = (original_size.0 * original_size.1) as f64;
     let mut power_spectral_density = complex_data.mapv(|c| c.norm_sqr() * pixel_area / n_original);
 
@@ -1129,8 +1152,8 @@ pub fn compute_fft(
     fftshift_2d(&mut power_spectral_density);
 
     // Calculate and shift frequency bins.
-    let mut freqs_x = fftfreq(cols, pixel_size);
-    let mut freqs_y = fftfreq(rows, pixel_size);
+    let mut freqs_x = fftfreq(cols, pixel_size_x);
+    let mut freqs_y = fftfreq(rows, pixel_size_y);
     fftshift_1d(&mut freqs_x);
     fftshift_1d(&mut freqs_y);
 
@@ -1221,15 +1244,22 @@ pub fn fftshift_2d<T>(array: &mut Array2<T>) {
 ///
 /// # Arguments
 /// * `result` - The `FFTResult` containing the computed spectrum, PSD, and frequencies.
-/// * `pixel_size` - The physical size of a pixel.
+/// * `pixel_size_x` - The physical size of a pixel in X.
+/// * `pixel_size_y` - The physical size of a pixel in Y.
 /// * `config` - The `ProcessConfig` containing output directory and other parameters.
+/// * `original_size` - The dimensions of the original terrain block.
+/// * `trend_coeffs` - Optional polynomial detrending coefficients.
+/// * `geo_transform` - Optional geotransform for the block.
+/// * `wkt` - Optional projection string.
+/// * `stats` - Optional detailed block statistics.
 ///
 /// # Returns
 /// A `Result` indicating success or failure.
 #[allow(clippy::too_many_arguments)]
 pub fn save_fft_results(
     result: &FFTResult,
-    pixel_size: f64,
+    pixel_size_x: f64,
+    pixel_size_y: f64,
     config: &ProcessConfig,
     original_size: (usize, usize),
     trend_coeffs: Option<Array1<f64>>,
@@ -1268,7 +1298,9 @@ pub fn save_fft_results(
         .iter()
         .fold(f64::NEG_INFINITY, |a, &b| a.max(b));
     let psd_mean = result.power_spectrum.mean().unwrap_or(0.0);
-    let f_nyquist = 1.0 / (2.0 * pixel_size);
+    
+    let mean_pixel_size = (pixel_size_x + pixel_size_y) / 2.0;
+    let f_nyquist = 1.0 / (2.0 * mean_pixel_size);
 
     let mut statistics_map = serde_json::Map::new();
     statistics_map.insert("psd_max".to_string(), json!(psd_max));
@@ -1291,6 +1323,12 @@ pub fn save_fft_results(
         trend_coeffs: trend_coeffs.map(|c| c.to_vec()),
         geo_transform,
         wkt,
+        normalization: Some(PSDNormalizationMetadata {
+            original_block_size: original_size,
+            pixel_size_x,
+            pixel_size_y,
+            psd_normalization: "physical_2D".to_string(),
+        }),
         processing_params: json!({
             "detrend_order": config.detrend,
             "min_padding": config.min_padding,

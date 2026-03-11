@@ -160,20 +160,35 @@ fn load_block(dir: &Path, coord: &BlockCoord, load_complex_data: bool) -> Result
     Ok(BlockData { psd, complex })
 }
 
-fn load_metadata_info(meta_path: &Path) -> Result<(Array1<f64>, Array1<f64>, f64, usize)> {
+fn load_metadata_info(meta_path: &Path) -> Result<(Array1<f64>, Array1<f64>, f64, f64, usize)> {
     let metadata: BTreeMap<String, Value> = serde_json::from_reader(fs::File::open(meta_path)?)?;
-    let stats = &metadata["statistics"];
-    let pixel_size = 1.0 / (2.0 * stats["f_nyquist"].as_f64().unwrap());
+    
+    let (pixel_size_x, pixel_size_y) = if let Some(norm) = metadata.get("normalization") {
+        (
+            norm["pixel_size_x"].as_f64().unwrap(),
+            norm["pixel_size_y"].as_f64().unwrap(),
+        )
+    } else {
+        let legacy_size = 1.0 / (2.0 * metadata["statistics"]["f_nyquist"].as_f64().unwrap());
+        (legacy_size, legacy_size)
+    };
+
     let (p_rows, p_cols) = (
         metadata["padded_size"][0].as_u64().unwrap() as usize,
         metadata["padded_size"][1].as_u64().unwrap() as usize,
     );
     let window_size = metadata["original_size"][0].as_u64().unwrap() as usize;
-    let mut fx = fft_core::fftfreq(p_cols, pixel_size);
-    let mut fy = fft_core::fftfreq(p_rows, pixel_size);
+    let mut fx = fft_core::fftfreq(p_cols, pixel_size_x);
+    let mut fy = fft_core::fftfreq(p_rows, pixel_size_y);
     fft_core::fftshift_1d(&mut fx);
     fft_core::fftshift_1d(&mut fy);
-    Ok((Array1::from(fx), Array1::from(fy), pixel_size, window_size))
+    Ok((
+        Array1::from(fx),
+        Array1::from(fy),
+        pixel_size_x,
+        pixel_size_y,
+        window_size,
+    ))
 }
 
 fn compute_radial_mean(
@@ -265,8 +280,9 @@ fn main() -> Result<()> {
     println!("{}\n", dline);
 
     let meta_path = find_first_metadata(&args.input_a)?;
-    let (fx, fy, pixel_size, window_size) = load_metadata_info(&meta_path)?;
-    let k_min_limit = 2.0 / (window_size as f64 * pixel_size);
+    let (fx, fy, pixel_size_x, pixel_size_y, window_size) = load_metadata_info(&meta_path)?;
+    let mean_pixel_size = (pixel_size_x + pixel_size_y) / 2.0;
+    let k_min_limit = 2.0 / (window_size as f64 * mean_pixel_size);
     let coords = find_block_coords(&args.input_a)?;
     let n_blocks = coords.len();
 

@@ -1,11 +1,10 @@
 use anyhow::{Context, Result};
 use clap::Parser;
 use console::Term;
-use fft_core::{prepare_output_dir, save_gdal_raster, text};
+use fft_core::{prepare_output_dir, save_gdal_raster, text, BlockMetadata};
 use gdal::Dataset;
 use ndarray::{Array1, Array2};
 use rayon::prelude::*;
-use serde::Deserialize;
 use serde_json::json;
 use std::f64::consts::PI;
 use std::fs;
@@ -47,20 +46,6 @@ struct Args {
     /// Number of parallel jobs to run. Defaults to 0 (Rayon chooses).
     #[arg(long, default_value_t = 0)]
     jobs: usize,
-}
-
-/// Structure to deserialize block metadata from JSON files.
-#[derive(Deserialize, Debug)]
-struct BlockMetadata {
-    original_size: (usize, usize),
-    #[serde(default)]
-    statistics: Stats,
-}
-
-/// Statistics loaded from block metadata, including Nyquist frequency.
-#[derive(Deserialize, Debug, Default)]
-struct Stats {
-    f_nyquist: f64,
 }
 
 /// Holds the calculated polar spectrum data.
@@ -135,6 +120,7 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    let term = Term::stdout();
     let progress_counter = Arc::new(Mutex::new(0));
 
     print!("Transforming to polar coordinates...");
@@ -142,21 +128,26 @@ fn main() -> Result<()> {
 
     // Process each PSD file in parallel using Rayon.
     let args_arc = std::sync::Arc::new(args);
+    let error_occurred = std::sync::atomic::AtomicBool::new(false);
     entries.par_iter().for_each(|entry| {
         let args_clone = args_arc.clone();
         if let Err(e) = process_file(&entry.path(), &output_dir, &args_clone) {
-            eprintln!("\n{} Failed to process {}: {}", text::error("Error"), entry.path().display(), e);
+            eprintln!("\n{} Failed to process {}: {:?}", text::error("Error"), entry.path().display(), e);
+            error_occurred.store(true, std::sync::atomic::Ordering::Relaxed);
         }
 
         let mut count = progress_counter.lock().unwrap();
         *count += 1;
-        let term = Term::stdout();
         let _ = term.clear_line();
         print!("\rTransforming to polar coordinates... {:.0}%", (*count as f32 / n_files as f32) * 100.0);
         let _ = std::io::stdout().flush();
     });
 
-    let term = Term::stdout();
+    // Final check for any errors during parallel processing.
+    if error_occurred.load(std::sync::atomic::Ordering::Relaxed) {
+        anyhow::bail!("One or more files failed to process.");
+    }
+
     let _ = term.clear_line();
     println!("\r{} All files transformed successfully.", text::check_icon());
     println!("{}", line);
@@ -166,7 +157,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-type PsdData = (Array2<f64>, Array1<f64>, Array1<f64>, f64, (usize, usize));
+type PsdData = (Array2<f64>, Array1<f64>, Array1<f64>, f64, f64, (usize, usize));
 
 /// Processes a single PSD file: loads data, calculates polar spectrum,
 /// and saves results.
@@ -179,14 +170,15 @@ type PsdData = (Array2<f64>, Array1<f64>, Array1<f64>, f64, (usize, usize));
 /// # Returns
 /// A `Result` indicating success or failure.
 fn process_file(psd_path: &Path, output_dir: &Path, args: &Args) -> Result<()> {
-    let (psd, freqs_x, freqs_y, pixel_size, original_size) = load_psd(psd_path)?;
+    let (psd, freqs_x, freqs_y, pixel_size_x, pixel_size_y, original_size) = load_psd(psd_path)?;
 
     // Calculate the polar representation of the PSD.
     let polar_spectrum_data = calculate_polar_spectrum(
         &psd,
         &freqs_x,
         &freqs_y,
-        pixel_size,
+        pixel_size_x,
+        pixel_size_y,
         original_size.0,
         args.n_angles,
         args.n_wavenumbers,
@@ -246,9 +238,11 @@ fn process_file(psd_path: &Path, output_dir: &Path, args: &Args) -> Result<()> {
 ///   - `Array2<f64>`: The PSD data (linear scale).
 ///   - `Array1<f64>`: X-frequencies.
 ///   - `Array1<f64>`: Y-frequencies.
-///   - `f64`: Pixel size used during FFT.
+///   - `f64`: Pixel size in X.
+///   - `f64`: Pixel size in Y.
 ///   - `(usize, usize)`: The original (unpadded) size of the block.
 fn load_psd(psd_path: &Path) -> Result<PsdData> {
+    println!("Loading PSD: {:?}", psd_path);
     let dataset = Dataset::open(psd_path)?;
     let band = dataset.rasterband(1)?;
     let (cols, rows) = band.size();
@@ -271,18 +265,26 @@ fn load_psd(psd_path: &Path) -> Result<PsdData> {
                 .replace("fft_psd_block_", "fft_metadata_block_"),
         )
         .with_extension("json");
+    println!("Loading Metadata: {:?}", meta_path);
 
     // Load metadata to retrieve Nyquist frequency and pixel size.
     let meta_file = fs::File::open(&meta_path)
         .with_context(|| format!("Failed to open metadata file: {:?}", meta_path))?;
     let metadata: BlockMetadata = serde_json::from_reader(meta_file)?;
-    let f_nyquist = metadata.statistics.f_nyquist;
-    let pixel_size = 1.0 / (2.0 * f_nyquist);
+    
+    let (pixel_size_x, pixel_size_y) = if let Some(norm) = metadata.normalization.as_ref() {
+        (norm.pixel_size_x, norm.pixel_size_y)
+    } else {
+        let f_nyquist = metadata.statistics["f_nyquist"].as_f64().unwrap_or(0.5);
+        let legacy_size = 1.0 / (2.0 * f_nyquist);
+        (legacy_size, legacy_size)
+    };
     let original_size = metadata.original_size;
+    println!("Pixel size X: {}, Y: {}, Orig size: {:?}", pixel_size_x, pixel_size_y, original_size);
 
     // Calculate and shift frequencies for X and Y axes.
-    let mut freqs_x = fft_core::fftfreq(cols, pixel_size);
-    let mut freqs_y = fft_core::fftfreq(rows, pixel_size);
+    let mut freqs_x = fft_core::fftfreq(cols, pixel_size_x);
+    let mut freqs_y = fft_core::fftfreq(rows, pixel_size_y);
     fft_core::fftshift_1d(&mut freqs_x);
     fft_core::fftshift_1d(&mut freqs_y);
 
@@ -290,7 +292,8 @@ fn load_psd(psd_path: &Path) -> Result<PsdData> {
         psd,
         Array1::from(freqs_x),
         Array1::from(freqs_y),
-        pixel_size,
+        pixel_size_x,
+        pixel_size_y,
         original_size,
     ))
 }
@@ -305,7 +308,8 @@ fn load_psd(psd_path: &Path) -> Result<PsdData> {
 /// * `psd` - The 2D Cartesian Power Spectral Density data.
 /// * `freqs_x` - Array of frequencies along the X-axis.
 /// * `freqs_y` - Array of frequencies along the Y-axis.
-/// * `pixel_size` - The physical size of a pixel in the original spatial data.
+/// * `pixel_size_x` - The physical size of a pixel in X.
+/// * `pixel_size_y` - The physical size of a pixel in Y.
 /// * `original_window_size` - The original (unpadded) window size in pixels.
 /// * `n_angles` - The number of angular bins.
 /// * `n_wavenumbers` - The number of radial wavenumber (k) bins.
@@ -316,7 +320,8 @@ fn calculate_polar_spectrum(
     psd: &Array2<f64>,
     freqs_x: &Array1<f64>,
     freqs_y: &Array1<f64>,
-    pixel_size: f64,
+    pixel_size_x: f64,
+    pixel_size_y: f64,
     original_window_size: usize,
     n_angles: usize,
     n_wavenumbers: usize,
@@ -327,10 +332,11 @@ fn calculate_polar_spectrum(
     let cartesian_cell_area = dkx * dky;
 
     // 1. Define bins in k-space (wavenumber) and theta-space (angle)
-    // k_max corresponds to the Nyquist frequency (1 / (2 * pixel_size)).
-    let k_max = 1.0 / (2.0 * pixel_size);
+    // k_max corresponds to the Nyquist frequency.
+    let mean_pixel_size = (pixel_size_x + pixel_size_y) / 2.0;
+    let k_max = 1.0 / (2.0 * mean_pixel_size);
     // k_min corresponds to the largest wavelength to be analyzed (window_size / 2).
-    let k_min = 2.0 / (original_window_size as f64 * pixel_size);
+    let k_min = 2.0 / (original_window_size as f64 * mean_pixel_size);
 
     let log_k_min = k_min.log10();
     let log_k_max = k_max.log10();

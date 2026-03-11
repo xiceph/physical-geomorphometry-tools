@@ -4,19 +4,22 @@ use gdal::DriverManager;
 use gdal::spatial_ref::SpatialRef;
 use std::path::Path;
 
+/// Creates a synthetic DEM (GeoTIFF) containing a superposition of sine and cosine waves.
+/// 
+/// This helper generates a deterministic terrain surface for testing spatial decomposition
+/// and FFT accuracy. It includes a standard GeoTransform and WKT projection.
 fn create_synthetic_dem(path: &Path, width: usize, height: usize) {
     let driver = DriverManager::get_driver_by_name("GTiff").unwrap();
     let mut ds = driver.create_with_band_type::<f64, _>(path, width, height, 1).unwrap();
     
-    // Set GeoTransform and Projection (WGS84)
-    // origin x, pixel width, rotation, origin y, rotation, pixel height
+    // Set GeoTransform: origin x, pixel width, rotation, origin y, rotation, pixel height.
     let geo_transform = [0.0, 1.0, 0.0, 0.0, 0.0, -1.0];
     ds.set_geo_transform(&geo_transform).unwrap();
 
     let srs = SpatialRef::from_epsg(4326).unwrap();
     ds.set_spatial_ref(&srs).unwrap();
     
-    // Simple sine wave
+    // Generate wave pattern: z(x,y) = sin(x/10) + cos(y/10).
     let mut data = vec![0.0; width * height];
     for y in 0..height {
         for x in 0..width {
@@ -30,18 +33,24 @@ fn create_synthetic_dem(path: &Path, width: usize, height: usize) {
     band.set_no_data_value(Some(-9999.0)).unwrap();
 }
 
+/// Verifies the full execution lifecycle of the `fft-process` tool.
+/// 
+/// This integration test ensures that:
+/// 1. The sliding window decomposition correctly calculates block coordinates.
+/// 2. All required output artifacts (PSD, metadata) are generated for each block.
+/// 3. Scientific validity (e.g., energy conservation) is maintained across the transform.
 #[test]
 fn test_fft_process_execution() {
     let temp_dir = tempfile::tempdir().unwrap();
     let input_path = temp_dir.path().join("input.tif");
-    // Ensure output directory name is unique or clean.
-    // fft-process appends .1, .2 if dir exists, but here we provide a path that shouldn't exist yet?
-    // temp_dir exists. We want a subdirectory.
     let output_dir = temp_dir.path().join("output");
 
+    // Create a 64x64 synthetic DEM.
     create_synthetic_dem(&input_path, 64, 64);
 
-    let mut cmd = Command::cargo_bin("fft-process").unwrap();
+    // Execute `fft-process` with a 32x32 window and 0 overlap.
+    // This should result in exactly 4 non-overlapping blocks.
+    let mut cmd = Command::new(assert_cmd::cargo_bin!("fft-process"));
     cmd.arg("--input").arg(&input_path)
        .arg("--output").arg(&output_dir)
        .arg("--window-size").arg("32")
@@ -50,14 +59,7 @@ fn test_fft_process_execution() {
        .assert()
        .success();
 
-    // Check outputs
-    // 64x64 DEM, 32x32 window, 0 overlap -> 4 blocks: (0,0), (0,32), (32,0), (32,32)
-    // Wait, the logic loop:
-    // for r in 0..n_rows { for c in 0..n_cols { ... } }
-    // n_cols = (width - window) / step + 1
-    // (64 - 32) / 32 + 1 = 1 + 1 = 2.
-    // So 0 and 32. Correct.
-
+    // Verify the existence of output files for each block.
     let expected_files = [
         "fft_psd_block_0_0.tif",
         "fft_metadata_block_0_0.json",
@@ -67,25 +69,31 @@ fn test_fft_process_execution() {
     ];
 
     for file in expected_files {
-        assert!(output_dir.join(file).exists(), "File {} missing", file);
+        assert!(output_dir.join(file).exists(), "Expected artifact {} missing from output directory.", file);
     }
     
-    // Check metadata for scientific validity
+    // Perform a scientific validity check on the generated metadata.
     let meta_path = output_dir.join("fft_metadata_block_0_0.json");
     let meta_content = std::fs::read_to_string(meta_path).unwrap();
     let meta_json: serde_json::Value = serde_json::from_str(&meta_content).unwrap();
     
-    // Check Parseval Error
-    // The key might be in "statistics" object
+    // 1. Verify Normalization Metadata
+    let norm = meta_json.get("normalization").expect("Normalization object missing from metadata.");
+    assert_eq!(norm["psd_normalization"], "physical_2D");
+    assert_eq!(norm["pixel_size_x"], 1.0);
+    assert_eq!(norm["pixel_size_y"], 1.0);
+    assert_eq!(norm["original_block_size"], serde_json::json!([32, 32]));
+
+    // 2. Parseval's check: Ensure energy conservation between spatial and frequency domains.
     if let Some(stats) = meta_json.get("statistics") {
         if let Some(error_val) = stats.get("parseval_error") {
             let parseval_error = error_val.as_f64().unwrap();
-             // 1e-6 is the tolerance in the code, but we use slightly looser here just in case of float diffs
-            assert!(parseval_error < 1e-5, "Parseval error too high: {}", parseval_error);
+            // Tolerance is slightly higher than core check to account for multi-tool I/O float precision.
+            assert!(parseval_error < 1e-5, "Parseval energy conservation check failed (error: {:.2e}).", parseval_error);
         } else {
-             panic!("parseval_error missing in statistics");
+             panic!("'parseval_error' field missing from block statistics.");
         }
     } else {
-        panic!("statistics missing in metadata");
+        panic!("'statistics' object missing from block metadata JSON.");
     }
 }

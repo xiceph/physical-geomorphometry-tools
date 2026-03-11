@@ -186,11 +186,19 @@ fn process_block(metadata_path: &Path, output_dir: &Path, args: &Args) -> Result
         });
 
     // 2. Create the filter mask
-    let pixel_size = 1.0 / (2.0 * metadata.statistics["f_nyquist"].as_f64().unwrap_or(0.5));
+    let (pixel_size_x, pixel_size_y) = if let Some(norm) = metadata.normalization.as_ref() {
+        (norm.pixel_size_x, norm.pixel_size_y)
+    } else {
+        let legacy_size =
+            1.0 / (2.0 * metadata.statistics["f_nyquist"].as_f64().unwrap_or(0.5));
+        (legacy_size, legacy_size)
+    };
+
     let filter_mask = create_filter_mask(
         padded_rows,
         padded_cols,
-        pixel_size,
+        pixel_size_x,
+        pixel_size_y,
         args.min_wavelength,
         args.max_wavelength,
         args.taper_width,
@@ -243,7 +251,8 @@ fn process_block(metadata_path: &Path, output_dir: &Path, args: &Args) -> Result
 /// # Arguments
 /// * `rows` - The number of rows in the spectrum (and the mask to be created).
 /// * `cols` - The number of columns in the spectrum.
-/// * `pixel_size` - The physical size of a pixel in the original spatial data (in meters).
+/// * `pixel_size_x` - The physical size of a pixel in the X direction.
+/// * `pixel_size_y` - The physical size of a pixel in the Y direction.
 /// * `min_wavelength` - If Some, specifies the cutoff for a high-pass filter in meters.
 /// * `max_wavelength` - If Some, specifies the cutoff for a low-pass filter in meters.
 /// * `taper_width` - The width of the transition band as a proportion of the cutoff frequency.
@@ -253,16 +262,17 @@ fn process_block(metadata_path: &Path, output_dir: &Path, args: &Args) -> Result
 fn create_filter_mask(
     rows: usize,
     cols: usize,
-    pixel_size: f64,
+    pixel_size_x: f64,
+    pixel_size_y: f64,
     min_wavelength: Option<f64>,
     max_wavelength: Option<f64>,
     taper_width: f64,
 ) -> Result<Array2<f64>> {
-    let mut freqs_x = fft_core::fftfreq(cols, pixel_size);
+    let mut freqs_x = fft_core::fftfreq(cols, pixel_size_x);
     fft_core::fftshift_1d(&mut freqs_x);
     let freqs_x = Array1::from_vec(freqs_x);
 
-    let mut freqs_y = fft_core::fftfreq(rows, pixel_size);
+    let mut freqs_y = fft_core::fftfreq(rows, pixel_size_y);
     fft_core::fftshift_1d(&mut freqs_y);
     let freqs_y = Array1::from_vec(freqs_y);
 

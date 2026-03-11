@@ -170,7 +170,7 @@ fn main() -> Result<()> {
 
     // Initialize the BlockProcessor, which handles DEM loading and block iteration.
     let processor = BlockProcessor::new(final_config)?;
-    let pixel_size = processor.pixel_size();
+    let (pixel_size_x, pixel_size_y) = processor.pixel_size_xy();
     let config_arc = processor.config(); // Get an Arc to the config for parallel processing.
     let geo_transform_arc = Arc::new(*processor.geo_transform());
     let wkt_arc = Arc::new(processor.wkt().cloned());
@@ -262,28 +262,43 @@ fn main() -> Result<()> {
             }
 
             // Compute the 2D FFT.
-            let fft_result = compute_fft(&final_data, pixel_size, row_start, col_start, original_size)?;
+            let fft_result = compute_fft(
+                &final_data,
+                pixel_size_x,
+                pixel_size_y,
+                row_start,
+                col_start,
+                original_size,
+            )?;
 
             // --- Statistics and Validation ---
-            stats.total_power = fft_result.power_spectrum.sum();
+            let (rows_p, cols_p) = final_data.dim();
+            let dkx = 1.0 / (cols_p as f64 * pixel_size_x);
+            let dky = 1.0 / (rows_p as f64 * pixel_size_y);
+            let psd_integral = fft_result.power_spectrum.sum() * dkx * dky;
 
-            let spatial_mean_square = final_data.mapv(|v| v.powi(2)).mean().unwrap_or(0.0);
+            // Spatial energy normalized by the physical area/sample count of the original block.
+            let spatial_variance = final_data.mapv(|v| v.powi(2)).sum()
+                / (original_size.0 * original_size.1) as f64;
 
-            if spatial_mean_square > 1e-9 {
-                stats.parseval_error =
-                    (stats.total_power - spatial_mean_square).abs() / spatial_mean_square;
+            stats.total_power = psd_integral;
+
+            if spatial_variance > 1e-9 {
+                stats.parseval_error = (psd_integral - spatial_variance).abs() / spatial_variance;
             }
 
             let (rows, cols) = fft_result.power_spectrum.dim();
             let dc_power = fft_result.power_spectrum[[rows / 2, cols / 2]];
-            if stats.total_power > 1e-9 {
-                stats.dc_power_percentage = (dc_power / stats.total_power) * 100.0;
+            let total_psd_sum = fft_result.power_spectrum.sum();
+            if total_psd_sum > 1e-9 {
+                stats.dc_power_percentage = (dc_power / total_psd_sum) * 100.0;
             }
 
             // Save the FFT results (PSD, complex spectrum, metadata).
             save_fft_results(
                 &fft_result,
-                pixel_size,
+                pixel_size_x,
+                pixel_size_y,
                 &config_arc,
                 original_size,
                 trend_coeffs_option,

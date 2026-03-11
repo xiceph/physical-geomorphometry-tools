@@ -5,6 +5,14 @@ use std::io::Write;
 use serde_json::json;
 use approx::assert_relative_eq;
 
+/// Verifies the accuracy of the spatial reconstruction (Inverse FFT).
+///
+/// This test performs a full round-trip:
+/// 1. Generates a synthetic signal.
+/// 2. Computes the Forward FFT.
+/// 3. Simulates the output files of `fft-process`.
+/// 4. Executes the `fft-inverse` CLI tool.
+/// 5. Compares the reconstructed DEM against the original signal.
 #[test]
 fn test_round_trip_accuracy() {
     let temp_dir = tempfile::tempdir().unwrap();
@@ -12,6 +20,7 @@ fn test_round_trip_accuracy() {
     let output_file = temp_dir.path().join("reconstructed.tif");
     std::fs::create_dir(&input_dir).unwrap();
 
+    // Create a synthetic signal (sine wave) for the input block.
     let size = 32;
     let mut data = Array2::<f64>::zeros((size, size));
     for r in 0..size {
@@ -20,11 +29,10 @@ fn test_round_trip_accuracy() {
         }
     }
 
-    // 1. Manually compute FFT and save like fft-process would
-    // We use fft-core directly to generate the mock data
-    let fft_result = fft_core::compute_fft(&data, 1.0, 0, 0, (size, size)).unwrap();
+    // 1. Manually compute FFT using the core library to generate mock input data.
+    let fft_result = fft_core::compute_fft(&data, 1.0, 1.0, 0, 0, (size, size)).unwrap();
     
-    // Save complex bin
+    // Save the complex spectrum to a binary file, mimicking `fft-process`.
     let bin_path = input_dir.join("fft_complex_block_0_0.bin");
     let mut f = File::create(bin_path).unwrap();
     for c in fft_result.spectrum.iter() {
@@ -32,7 +40,7 @@ fn test_round_trip_accuracy() {
         f.write_all(&c.im.to_le_bytes()).unwrap();
     }
     
-    // Save metadata json
+    // Save the block metadata to a JSON file.
     let meta_path = input_dir.join("fft_metadata_block_0_0.json");
     let metadata = json!({
         "block_position": [0, 0],
@@ -47,14 +55,14 @@ fn test_round_trip_accuracy() {
     });
     std::fs::write(meta_path, serde_json::to_string_pretty(&metadata).unwrap()).unwrap();
 
-    // 2. Run fft-inverse
-    let mut cmd = Command::cargo_bin("fft-inverse").unwrap();
+    // 2. Run the `fft-inverse` command-line tool on the simulated input directory.
+    let mut cmd = Command::new(assert_cmd::cargo_bin!("fft-inverse"));
     cmd.arg("--input").arg(&input_dir)
        .arg("--output").arg(&output_file)
        .assert()
        .success();
 
-    // 3. Load result and compare
+    // 3. Load the reconstructed GeoTIFF and compare pixel values with the original data.
     let ds = gdal::Dataset::open(output_file).unwrap();
     let band = ds.rasterband(1).unwrap();
     let (cols, rows) = band.size();
@@ -62,6 +70,7 @@ fn test_round_trip_accuracy() {
     
     for r in 0..size {
         for c in 0..size {
+            // Assert that the reconstructed value matches the original within float tolerance.
             assert_relative_eq!(recon_data[r * size + c], data[[r, c]], epsilon = 1e-10);
         }
     }
