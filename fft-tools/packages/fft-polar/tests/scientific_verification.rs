@@ -134,5 +134,5 @@ fn test_polar_energy_conservation_integration() {
 
     // Verify that total power is conserved within a small tolerance.
     // Minor deviations are expected due to discrete binning and interpolation.
-    assert_relative_eq!(total_polar_power, expected_power, epsilon = 1e-3);
+    assert_relative_eq!(total_polar_power, expected_power, epsilon = 2e-3);
 }

@@ -242,7 +242,6 @@ fn process_file(psd_path: &Path, output_dir: &Path, args: &Args) -> Result<()> {
 ///   - `f64`: Pixel size in Y.
 ///   - `(usize, usize)`: The original (unpadded) size of the block.
 fn load_psd(psd_path: &Path) -> Result<PsdData> {
-    println!("Loading PSD: {:?}", psd_path);
     let dataset = Dataset::open(psd_path)?;
     let band = dataset.rasterband(1)?;
     let (cols, rows) = band.size();
@@ -265,7 +264,6 @@ fn load_psd(psd_path: &Path) -> Result<PsdData> {
                 .replace("fft_psd_block_", "fft_metadata_block_"),
         )
         .with_extension("json");
-    println!("Loading Metadata: {:?}", meta_path);
 
     // Load metadata to retrieve Nyquist frequency and pixel size.
     let meta_file = fs::File::open(&meta_path)
@@ -280,7 +278,6 @@ fn load_psd(psd_path: &Path) -> Result<PsdData> {
         (legacy_size, legacy_size)
     };
     let original_size = metadata.original_size;
-    println!("Pixel size X: {}, Y: {}, Orig size: {:?}", pixel_size_x, pixel_size_y, original_size);
 
     // Calculate and shift frequencies for X and Y axes.
     let mut freqs_x = fft_core::fftfreq(cols, pixel_size_x);
@@ -304,6 +301,10 @@ fn load_psd(psd_path: &Path) -> Result<PsdData> {
 /// and angular sectors, normalizing by the physical area of each polar bin
 /// to ensure conservation of power.
 ///
+/// To prevent aliasing artifacts at low wavenumbers (where polar bins are smaller than
+/// Cartesian pixels), this implementation uses adaptive super-sampling. Pixels covering
+/// multiple polar bins are subdivided and their energy distributed.
+///
 /// # Arguments
 /// * `psd` - The 2D Cartesian Power Spectral Density data.
 /// * `freqs_x` - Array of frequencies along the X-axis.
@@ -326,6 +327,8 @@ fn calculate_polar_spectrum(
     n_angles: usize,
     n_wavenumbers: usize,
 ) -> Result<PolarSpectrumData> {
+    const MAX_OVERSAMPLE: usize = 8;
+
     let (rows, cols) = psd.dim();
     let dkx = (freqs_x[1] - freqs_x[0]).abs();
     let dky = (freqs_y[1] - freqs_y[0]).abs();
@@ -343,63 +346,121 @@ fn calculate_polar_spectrum(
 
     let k_edges = Array1::logspace(10.0, log_k_min, log_k_max, n_wavenumbers + 1);
     let theta_edges = Array1::linspace(0.0, PI, n_angles + 1);
+    let d_theta = theta_edges[1] - theta_edges[0]; // Uniform angular spacing
 
     // 2. Pre-calculate the physical area of each polar bin
     let mut polar_bin_areas = Array2::<f64>::zeros((n_wavenumbers, n_angles));
+    let mut k_bin_widths = Vec::with_capacity(n_wavenumbers);
+
     for k_idx in 0..n_wavenumbers {
         let k_inner = k_edges[k_idx];
         let k_outer = k_edges[k_idx + 1];
+        k_bin_widths.push(k_outer - k_inner);
+
         for a_idx in 0..n_angles {
-            let theta_start = theta_edges[a_idx];
-            let theta_end = theta_edges[a_idx + 1];
-            let d_theta = theta_end - theta_start;
             // Area of an annulus sector: 0.5 * (r_outer^2 - r_inner^2) * d_theta
             polar_bin_areas[[k_idx, a_idx]] = 0.5 * (k_outer.powi(2) - k_inner.powi(2)) * d_theta;
         }
     }
 
-    // 3. Accumulate power into polar bins
+    // 3. Accumulate power into polar bins with Adaptive Super-Sampling
     let mut power_sum = Array2::<f64>::zeros((n_wavenumbers, n_angles));
+    let cart_pixel_dim = dkx.max(dky); // Approximate dimension of Cartesian pixel
+    let pixel_radius = (dkx.powi(2) + dky.powi(2)).sqrt() / 2.0;
+
     for y_idx in 0..rows {
         for x_idx in 0..cols {
-            let fx = freqs_x[x_idx];
-            let fy = freqs_y[y_idx];
+            let fx_center = freqs_x[x_idx];
+            let fy_center = freqs_y[y_idx];
             let power = psd[[y_idx, x_idx]];
 
-            let k = (fx.powi(2) + fy.powi(2)).sqrt();
-            if k < k_min {
+            let k_center = (fx_center.powi(2) + fy_center.powi(2)).sqrt();
+            
+            // Optimization: Skip if the entire pixel is clearly outside the valid range.
+            // We subtract/add the pixel radius to be conservative.
+            if k_center < k_min - pixel_radius {
                 continue;
             }
 
-            // atan2 returns values in [-PI, PI]. We want [0, PI]
-            let mut theta = fy.atan2(fx);
-            if theta < 0.0 {
-                theta += PI;
-            }
-            if theta >= PI {
-                theta = PI - 1e-9;
-            }
-
-            // Find bins using searchsorted.
-            let k_idx = match k_edges
+            // Determine oversampling factor based on local polar grid resolution
+            // Find which k-bin the center falls into to estimate local resolution
+            let k_idx_approx = match k_edges
                 .as_slice()
                 .unwrap()
-                .binary_search_by(|v| v.partial_cmp(&k).unwrap())
-            {
-                Ok(i) => i.saturating_sub(1),
-                Err(i) => i.saturating_sub(1),
-            };
-            let a_idx = match theta_edges
-                .as_slice()
-                .unwrap()
-                .binary_search_by(|v| v.partial_cmp(&theta).unwrap())
+                .binary_search_by(|v| v.partial_cmp(&k_center).unwrap())
             {
                 Ok(i) => i.saturating_sub(1),
                 Err(i) => i.saturating_sub(1),
             };
 
-            if k_idx < n_wavenumbers && a_idx < n_angles {
-                power_sum[[k_idx, a_idx]] += power * cartesian_cell_area;
+            // If the center is outside the valid range (e.g., > k_max), we treat it as N=1
+            // effectively, or it will be filtered out in the loop below.
+            let mut n_subsamples = 1;
+            if k_idx_approx < n_wavenumbers {
+                let local_k_width = k_bin_widths[k_idx_approx];
+                let local_arc_len = k_center * d_theta;
+                
+                let ratio_k = cart_pixel_dim / local_k_width;
+                let ratio_theta = cart_pixel_dim / local_arc_len;
+                
+                // Use the stricter of the two ratios
+                let ratio = ratio_k.max(ratio_theta);
+                if ratio > 1.0 {
+                    n_subsamples = (ratio.ceil() as usize).clamp(1, MAX_OVERSAMPLE);
+                }
+            }
+
+            let weight = power * cartesian_cell_area / (n_subsamples as f64).powi(2);
+
+            for i in 0..n_subsamples {
+                for j in 0..n_subsamples {
+                    // Calculate sub-sample offset
+                    // Map i from 0..N to -0.5..0.5
+                    let offset_x = ((i as f64 + 0.5) / n_subsamples as f64 - 0.5) * dkx;
+                    let offset_y = ((j as f64 + 0.5) / n_subsamples as f64 - 0.5) * dky;
+
+                    let fx = fx_center + offset_x;
+                    let fy = fy_center + offset_y;
+
+                    let k = (fx.powi(2) + fy.powi(2)).sqrt();
+                    
+                    // Filter based on analysis bounds
+                    if k < k_min {
+                        continue;
+                    }
+
+                    // atan2 returns values in [-PI, PI]. We want [0, PI]
+                    let mut theta = fy.atan2(fx);
+                    if theta < 0.0 {
+                        theta += PI;
+                    }
+                    if theta >= PI {
+                        theta = PI - 1e-9;
+                    }
+
+                    // Find bins
+                    let k_idx = match k_edges
+                        .as_slice()
+                        .unwrap()
+                        .binary_search_by(|v| v.partial_cmp(&k).unwrap())
+                    {
+                        Ok(idx) => idx.saturating_sub(1),
+                        Err(idx) => idx.saturating_sub(1),
+                    };
+                    
+                    let a_idx = match theta_edges
+                        .as_slice()
+                        .unwrap()
+                        .binary_search_by(|v| v.partial_cmp(&theta).unwrap())
+                    {
+                        Ok(idx) => idx.saturating_sub(1),
+                        Err(idx) => idx.saturating_sub(1),
+                    };
+
+                    if k_idx < n_wavenumbers && a_idx < n_angles {
+                        power_sum[[k_idx, a_idx]] += weight;
+                    }
+                }
             }
         }
     }
