@@ -2,7 +2,7 @@ use anyhow::{bail, Context, Result};
 use charming::{
     component::{AngleAxis, Axis, Legend, PolarCoordinate, RadiusAxis, Title},
     datatype::CompositeValue,
-    element::{AxisType, Color, CoordinateSystem, Tooltip, Trigger, TriggerOn},
+    element::{AxisLabel, AxisType, Color, CoordinateSystem, Tooltip, Trigger, TriggerOn},
     series::{Bar, Line},
     Chart, HtmlRenderer,
 };
@@ -76,7 +76,7 @@ pub fn generate_and_save_rose_chart(
                 .type_(AxisType::Category)
                 .data(angle_labels),
         )
-        .radius_axis(RadiusAxis::new())
+        .radius_axis(RadiusAxis::new().axis_label(AxisLabel::new().formatter("function (value) { return value.toExponential(2); }")))
         .series(
             Bar::new()
                 .coordinate_system(CoordinateSystem::Polar)
@@ -93,6 +93,14 @@ pub fn generate_and_save_rose_chart(
     renderer
         .save(&chart, path)
         .context("Failed to save rose chart to file")?;
+
+    // Post-process HTML to unquote the JS function.
+    let content = std::fs::read_to_string(path).context("Failed to read chart file for post-processing")?;
+    let corrected_content = content.replace(
+        "\"function (value) { return value.toExponential(2); }\"",
+        "function (value) { return value.toExponential(2); }",
+    );
+    std::fs::write(path, corrected_content).context("Failed to write corrected chart file")?;
 
     Ok(())
 }
@@ -141,7 +149,8 @@ pub fn generate_and_save_line_chart(
             Axis::new()
                 .type_(AxisType::Log)
                 .name("Power")
-                .split_number(10), // Added split_number for more grid lines
+                .split_number(10) // Added split_number for more grid lines
+                .axis_label(AxisLabel::new().formatter("function (value) { return value.toExponential(2); }")),
         )
         .series(
             Line::new()
@@ -158,6 +167,14 @@ pub fn generate_and_save_line_chart(
     renderer
         .save(&chart, path)
         .context("Failed to save line chart to file")?;
+
+    // Post-process HTML to unquote the JS function. charming/serde serializes it as a string.
+    let content = std::fs::read_to_string(path).context("Failed to read chart file for post-processing")?;
+    let corrected_content = content.replace(
+        "\"function (value) { return value.toExponential(2); }\"",
+        "function (value) { return value.toExponential(2); }",
+    );
+    std::fs::write(path, corrected_content).context("Failed to write corrected chart file")?;
 
     Ok(())
 }
