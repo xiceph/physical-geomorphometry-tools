@@ -123,18 +123,19 @@ fn find_first_metadata(dir: &Path) -> Result<PathBuf> {
 }
 
 fn load_psd(path: &Path) -> Result<Array2<f64>> {
-    let dataset = Dataset::open(path)?;
-    let band = dataset.rasterband(1)?;
+    let dataset = Dataset::open(path).with_context(|| format!("Failed to open PSD dataset at {:?}", path))?;
+    let band = dataset.rasterband(1).with_context(|| format!("Failed to get raster band from {:?}", path))?;
     let (cols, rows) = band.size();
     let power_log = band
-        .read_as::<f64>((0, 0), (cols, rows), (cols, rows), None)?
+        .read_as::<f64>((0, 0), (cols, rows), (cols, rows), None)
+        .with_context(|| format!("Failed to read data from PSD band in {:?}", path))?
         .data()
         .to_vec();
     Ok(Array2::from_shape_vec((rows, cols), power_log)?.mapv(|p| 10.0_f64.powf(p) - 1e-12))
 }
 
 fn load_complex(path: &Path, rows: usize, cols: usize) -> Result<Array2<Complex<f64>>> {
-    let mut file = fs::File::open(path)?;
+    let mut file = fs::File::open(path).with_context(|| format!("Failed to open complex data file at {:?}", path))?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
     let mut data = Vec::with_capacity(rows * cols);
@@ -143,16 +144,18 @@ fn load_complex(path: &Path, rows: usize, cols: usize) -> Result<Array2<Complex<
         let im = f64::from_le_bytes(chunk[8..16].try_into()?);
         data.push(Complex::new(re, im));
     }
-    Array2::from_shape_vec((rows, cols), data).context("Reshape failed")
+    Array2::from_shape_vec((rows, cols), data).with_context(|| format!("Failed to reshape complex data from {:?}", path))
 }
 
 fn load_block(dir: &Path, coord: &BlockCoord, load_complex_data: bool) -> Result<BlockData> {
-    let psd = load_psd(&dir.join(format!("fft_psd_block_{}_{}.tif", coord.row, coord.col)))?;
+    let psd_path = dir.join(format!("fft_psd_block_{}_{}.tif", coord.row, coord.col));
+    let psd = load_psd(&psd_path)?;
     let mut complex = None;
     if load_complex_data {
         let (rows, cols) = psd.dim();
+        let complex_path = dir.join(format!("fft_complex_block_{}_{}.bin", coord.row, coord.col));
         complex = Some(load_complex(
-            &dir.join(format!("fft_complex_block_{}_{}.bin", coord.row, coord.col)),
+            &complex_path,
             rows,
             cols,
         )?);

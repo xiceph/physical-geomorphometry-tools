@@ -209,8 +209,33 @@ fn process_block(metadata_path: &Path, output_dir: &Path, args: &Args) -> Result
         .and(&filter_mask)
         .for_each(|s, &m| *s *= m);
 
-    // 4. Save the new filtered data and updated metadata
+    // 4. Calculate new PSD and statistics
+    let pixel_area = pixel_size_x * pixel_size_y;
+    let n_original = (metadata.original_size.0 * metadata.original_size.1) as f64;
+    let power_spectral_density = spectrum.mapv(|c| c.norm_sqr() * pixel_area / n_original);
+    
+    let psd_max = power_spectral_density
+        .iter()
+        .fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+    let psd_mean = power_spectral_density.mean().unwrap_or(0.0);
+
+    // 5. Save the new filtered data and updated metadata
     let output_filename_base = metadata_path.file_name().unwrap().to_str().unwrap();
+
+    // Save filtered PSD (log-transformed)
+    let filtered_psd_path = output_dir.join(
+        output_filename_base
+            .replace("fft_metadata_block_", "fft_psd_block_")
+            .replace(".json", ".tif"),
+    );
+    let log_psd = power_spectral_density.mapv(|p| (p + 1e-12).log10());
+    fft_core::save_gdal_raster(
+        &log_psd,
+        &filtered_psd_path,
+        metadata.geo_transform.as_ref(),
+        metadata.wkt.as_deref(),
+        None,
+    )?;
 
     // Save filtered complex spectrum
     let filtered_complex_path = output_dir.join(
@@ -230,9 +255,14 @@ fn process_block(metadata_path: &Path, output_dir: &Path, args: &Args) -> Result
         "max_wavelength_meters": args.max_wavelength,
         "taper_width_proportion": args.taper_width,
     });
-    // This assumes `processing_params` is a serde_json::Value::Object
+    
     if let Some(obj) = metadata.processing_params.as_object_mut() {
         obj.insert("filter".to_string(), filter_info);
+    }
+
+    if let Some(stats) = metadata.statistics.as_object_mut() {
+        stats.insert("psd_max".to_string(), json!(psd_max));
+        stats.insert("psd_mean".to_string(), json!(psd_mean));
     }
 
     let filtered_metadata_path = output_dir.join(output_filename_base);

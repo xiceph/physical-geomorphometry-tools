@@ -7,17 +7,11 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-
 anyhow = "1.0"
-
 clap = { version = "4.5", features = ["derive"] }
-
 fft-core = { path = "../fft-core" }
-
 ndarray = "0.15"
-
 rayon = "1.10"
-
 tracing = "0.1"
 gdal = "0.18"
 console = "0.16.2"
