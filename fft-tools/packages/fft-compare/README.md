@@ -11,6 +11,7 @@
 - **Retention Analysis:** Determine the wavelength threshold at which a certain percentage (e.g., 50%) of power is retained.
 - **Resolution Assessment:** Automatically identify the wavelength where coherence drops below a threshold (default 0.5), defining the "effective resolution".
 - **Visualization:** Generate interactive spectral plots (HTML) comparing the Mean PSD of both datasets (A vs B). This visualization focuses on absolute power levels, distinct from the relative metrics provided in the CSV.
+- **Adaptive Spectral Binning:** Automatically detects the effective bandwidth (99.999% power threshold) to focus analysis on frequencies where a meaningful signal exists.
 
 ## Usage
 
@@ -62,6 +63,17 @@ While the PSD ratio measures power, **Spectral Coherence** ($C_{AB}$) measures t
 *   **$C_{AB} \approx 1$:** The signals are perfectly correlated (same features, same phases).
 *   **$C_{AB} \approx 0$:** The signals are uncorrelated.
 A coherence threshold of **0.5** is a physically significant benchmark. If coherence drops below 0.5, the features at that scale in the modified dataset no longer reliably represent the reference features, even if the total power (PSD) remains high.
+
+#### Note on Coherence and Deterministic Filters
+When comparing a reference DEM to a version processed with a deterministic linear filter (e.g., `fft-filter`), the coherence behavior can be non-intuitive. For such filters, coherence remains exactly **1.0** for all wavelengths where the filter gain is non-zero, regardless of how much the power is attenuated. Coherence only drops to **0.0** at the exact frequency where the filter gain reaches zero. 
+
+In these cases, the **Power Retention (PSD Ratio)** is a more sensitive measure of signal attenuation, while **Coherence** identifies the hard limit where the signal has been completely removed.
+
+### 3. Adaptive Spectral Limit Detection & Interpolation
+To ensure precision when analyzing filtered or generalized datasets, `fft-compare` employs **Adaptive Spectral Binning**. Before comparison, the tool detects the effective bandwidth of both inputs (the wavenumber $k$ containing 99.999% of total power) and adds a 50% margin to fully capture the transition zone.
+
+By concentrating radial bins exclusively on this "active" frequency range rather than the entire Nyquist spectrum, the tool achieves higher resolution in the critical transition area. Furthermore, the tool uses **linear interpolation** between these bins to calculate the exact wavelength where the Power Retention and Coherence thresholds are crossed, providing much higher precision than simple bin-center reporting.
+
 
 ## Analyzing the Output
 

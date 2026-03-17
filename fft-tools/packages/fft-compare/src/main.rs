@@ -194,25 +194,52 @@ fn load_metadata_info(meta_path: &Path) -> Result<(Array1<f64>, Array1<f64>, f64
     ))
 }
 
+fn detect_spectral_limits(psd: &Array2<f64>, fx: &Array1<f64>, fy: &Array1<f64>) -> f64 {
+    let total_power: f64 = psd.sum();
+    if total_power <= 1e-18 {
+        return 0.0;
+    }
+
+    let (rows, cols) = psd.dim();
+    let mut k_powers: Vec<(f64, f64)> = Vec::with_capacity(rows * cols);
+    for r in 0..rows {
+        for c in 0..cols {
+            let k = (fx[c].powi(2) + fy[r].powi(2)).sqrt();
+            k_powers.push((k, psd[[r, c]]));
+        }
+    }
+
+    k_powers.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+
+    let mut cum_power = 0.0;
+    let threshold = 0.99999 * total_power; // Use 99.999% to capture more of the spectral tail
+    for (k, p) in k_powers {
+        cum_power += p;
+        if cum_power >= threshold {
+            return k;
+        }
+    }
+    (fx.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2)
+        + fy.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2))
+    .sqrt()
+}
+
 fn compute_radial_mean(
     psd: &Array2<f64>,
     fx: &Array1<f64>,
     fy: &Array1<f64>,
     n_bins: usize,
     k_min_limit: f64,
+    k_max_limit: f64,
 ) -> (Array1<f64>, Array1<f64>) {
     let (rows, cols) = psd.dim();
-    let k_max = (fx.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2)
-        + fy.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2))
-    .sqrt();
-    let k_min = (fx[1] - fx[0]).abs().min((fy[1] - fy[0]).abs());
-    let k_bins = Array1::logspace(10.0, k_min.log10(), k_max.log10(), n_bins + 1);
+    let k_bins = Array1::logspace(10.0, k_min_limit.log10(), k_max_limit.log10(), n_bins + 1);
     let mut sums = Array1::<f64>::zeros(n_bins);
     let mut counts = Array1::<f64>::zeros(n_bins);
     for r in 0..rows {
         for c in 0..cols {
             let k = (fx[c].powi(2) + fy[r].powi(2)).sqrt();
-            if k < k_min || k > k_max {
+            if k < k_min_limit || k > k_max_limit {
                 continue;
             }
             let idx = match k_bins
@@ -230,7 +257,7 @@ fn compute_radial_mean(
     let (mut rad, mut waves) = (Array1::<f64>::zeros(n_bins), Array1::<f64>::zeros(n_bins));
     for i in 0..n_bins {
         let k_mid = (k_bins[i] + k_bins[i + 1]) / 2.0;
-        rad[i] = if counts[i] > 0.0 && k_mid >= k_min_limit {
+        rad[i] = if counts[i] > 0.0 {
             sums[i] / counts[i]
         } else {
             f64::NAN
@@ -238,6 +265,33 @@ fn compute_radial_mean(
         waves[i] = 1.0 / k_mid;
     }
     (waves, rad)
+}
+
+/// Finds the interpolated wavelength where a profile crosses a threshold value.
+/// Assumes wavelengths are ordered (usually descending in this tool).
+fn find_threshold_crossing(wavelengths: &[f64], values: &[f64], threshold: f64) -> Option<f64> {
+    if values.is_empty() || values.len() != wavelengths.len() {
+        return None;
+    }
+    for i in 0..values.len() - 1 {
+        let v1 = values[i];
+        let v2 = values[i + 1];
+        if !v1.is_finite() || !v2.is_finite() {
+            continue;
+        }
+
+        if (v1 >= threshold && v2 <= threshold) || (v1 <= threshold && v2 >= threshold) {
+            let w1 = wavelengths[i];
+            let w2 = wavelengths[i + 1];
+            // Avoid division by zero if values are identical
+            if (v2 - v1).abs() < 1e-12 {
+                return Some(w1);
+            }
+            let fraction = (threshold - v1) / (v2 - v1);
+            return Some(w1 + fraction * (w2 - w1));
+        }
+    }
+    None
 }
 
 fn main() -> Result<()> {
@@ -289,6 +343,34 @@ fn main() -> Result<()> {
     let coords = find_block_coords(&args.input_a)?;
     let n_blocks = coords.len();
 
+    if n_blocks == 0 {
+        anyhow::bail!("No blocks found in input A.");
+    }
+
+    // --- Adaptive Spectral Limit Detection ---
+    println!("{} Effective Bandwidth...", text::bold("Detecting"));
+    let first_coord = &coords[0];
+    let b_a_ref = load_block(&args.input_a, first_coord, false)?;
+    let b_b_ref = load_block(&args.input_b, first_coord, false)?;
+
+    let k_max_a = detect_spectral_limits(&b_a_ref.psd, &fx, &fy);
+    let k_max_b = detect_spectral_limits(&b_b_ref.psd, &fx, &fy);
+
+    // Use the intersection of effective bandwidths, and add a 50% margin to see the decay.
+    let theoretical_k_max = (fx.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2)
+        + fy.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2))
+    .sqrt();
+    let effective_k_max = (k_max_a.min(k_max_b) * 1.5).min(theoretical_k_max).max(k_min_limit * 2.0);
+
+    // Adjust bins: focus on the range where data exists, maintaining resolution.
+    let log_range = effective_k_max.log10() - k_min_limit.log10();
+    let adaptive_n_bins = ((log_range * 64.0).max(24.0).min(64.0)) as usize;
+
+    println!("  {:<20} {:.4} to {:.4} cycles/m", "Wavenumber Range:", k_min_limit, effective_k_max);
+    println!("  {:<20} {:.2} to {:.2} m", "Wavelength Range:", 1.0/effective_k_max, 1.0/k_min_limit);
+    println!("  {:<20} {}", "Adaptive Bins:", adaptive_n_bins);
+    println!("{}\n", dline);
+
     if !args.output.exists() {
         fs::create_dir_all(&args.output)?;
     }
@@ -310,8 +392,8 @@ fn main() -> Result<()> {
             // Always load complex data for coherence
             let b_a = load_block(&args.input_a, coord, true)?;
             let b_b = load_block(&args.input_b, coord, true)?;
-            let (_, r_a) = compute_radial_mean(&b_a.psd, &fx, &fy, 64, k_min_limit);
-            let (waves, r_b) = compute_radial_mean(&b_b.psd, &fx, &fy, 64, k_min_limit);
+            let (_, r_a) = compute_radial_mean(&b_a.psd, &fx, &fy, adaptive_n_bins, k_min_limit, effective_k_max);
+            let (waves, r_b) = compute_radial_mean(&b_b.psd, &fx, &fy, adaptive_n_bins, k_min_limit, effective_k_max);
             let ratio = &r_b / &r_a;
 
             let mut coh_2d = Array2::<f64>::zeros((fy.len(), fx.len()));
@@ -328,7 +410,7 @@ fn main() -> Result<()> {
                     };
                 }
             }
-            let (_, r_coh) = compute_radial_mean(&coh_2d, &fx, &fy, 64, k_min_limit);
+            let (_, r_coh) = compute_radial_mean(&coh_2d, &fx, &fy, adaptive_n_bins, k_min_limit, effective_k_max);
 
             if args.save_partials {
                 let mut wtr = csv::Writer::from_path(
@@ -385,8 +467,8 @@ fn main() -> Result<()> {
 
     let global_psd_a = acc.psd_a_total / n_blocks_processed as f64;
     let global_psd_b = acc.psd_b_total / n_blocks_processed as f64;
-    let (waves, radial_a_global) = compute_radial_mean(&global_psd_a, &fx, &fy, 64, k_min_limit);
-    let (_, radial_b_global) = compute_radial_mean(&global_psd_b, &fx, &fy, 64, k_min_limit);
+    let (waves, radial_a_global) = compute_radial_mean(&global_psd_a, &fx, &fy, adaptive_n_bins, k_min_limit, effective_k_max);
+    let (_, radial_b_global) = compute_radial_mean(&global_psd_b, &fx, &fy, adaptive_n_bins, k_min_limit, effective_k_max);
 
     let avg_cross = acc.cross_psd_total / n_blocks_processed as f64;
     let mut coh_2d_global = Array2::<f64>::zeros((fy.len(), fx.len()));
@@ -400,7 +482,7 @@ fn main() -> Result<()> {
             };
         }
     }
-    let (_, global_coh_profile) = compute_radial_mean(&coh_2d_global, &fx, &fy, 64, k_min_limit);
+    let (_, global_coh_profile) = compute_radial_mean(&coh_2d_global, &fx, &fy, adaptive_n_bins, k_min_limit, effective_k_max);
 
     let mut header = vec!["wavelength", "mean_psd_a", "mean_psd_b", "mean_ratio"];
     if n_blocks_processed > 1 {
@@ -489,11 +571,9 @@ fn main() -> Result<()> {
 
     let mut thresholds_found = false;
 
-    if let Some(w) = mean_ratio_for_retention
-        .iter()
-        .find(|s| s.1.is_finite() && s.1 < args.retention_threshold / 100.0)
-        .map(|s| s.0)
-    {
+    // 1. Power Retention Threshold (Ratio)
+    let (waves_for_ret, ratios_for_ret): (Vec<f64>, Vec<f64>) = mean_ratio_for_retention.iter().cloned().unzip();
+    if let Some(w) = find_threshold_crossing(&waves_for_ret, &ratios_for_ret, args.retention_threshold / 100.0) {
         if !thresholds_found {
             println!("\n{} Spectral Thresholds:", text::bold("Summary"));
             println!("{}", line);
@@ -506,12 +586,12 @@ fn main() -> Result<()> {
         );
     }
 
-    if let Some(w) = waves
-        .iter()
-        .zip(global_coh_profile.iter())
-        .find(|(_, &c)| c.is_finite() && c < args.coherence_threshold)
-        .map(|(w, _)| *w)
-    {
+    // 2. Coherence Threshold
+    if let Some(w) = find_threshold_crossing(
+        waves.as_slice().unwrap(),
+        global_coh_profile.as_slice().unwrap(),
+        args.coherence_threshold
+    ) {
         if !thresholds_found {
             println!("\n{} Spectral Thresholds:", text::bold("Summary"));
             println!("{}", line);
