@@ -6,7 +6,7 @@ members = [ "packages/fft-analyze", "packages/fft-compare",
 resolver = "2"
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Richard Feciskanin <richard.feciskanin@uniba.sk>"]
 edition = "2021"
 repository = "https://github.com/xiceph/physical-geomorphometry-tools/tree/main/fft-tools"
