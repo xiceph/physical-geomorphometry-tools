@@ -3,7 +3,11 @@ name = "qem_generalization"
 description = "Tool for generalizing DEM using QEM."
 readme = "README.md"
 version = "1.2.0"
+rust-version = "1.87.0"
+authors = ["Richard Feciskanin <richard.feciskanin@uniba.sk>"]
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/xiceph/physical-geomorphometry-tools/tree/main/generalization"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
