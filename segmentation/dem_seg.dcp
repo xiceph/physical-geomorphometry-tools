@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<eCog.Proc UserName="KFG_Segment" Company="" Copyright="" version="20181002" use-reproducable-poly="1" project-unit="5" engine-version="10.5.0" engine-build="5490" update-topology="0" distance_calculation="CG" resampling_compatibility="0" ver="0">
+<eCog.Proc UserName="KFG_Segment" Company="" Copyright="" version="20181002" use-reproducable-poly="1" project-unit="1" engine-version="10.5.0" engine-build="5490" update-topology="0" distance_calculation="CG" resampling_compatibility="0" ver="0">
 	<ruleset-info>
 		<name></name>
 		<author>KFG_Segment</author>
@@ -44,36 +44,6 @@
 					<ChnlProxy strName="tc" flags="12">
 						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 					</ChnlProxy>
-					<ChnlProxy strName="Layer 1" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 2" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 3" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 4" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 5" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 6" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 7" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 8" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 9" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
-					<ChnlProxy strName="Layer 10" flags="4">
-						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
-					</ChnlProxy>
 					<ChnlProxy strName="elev" flags="12">
 						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 					</ChnlProxy>
@@ -96,7 +66,6 @@
 					<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 				</MapLvlProxy>
 				<MapLvlProxy strName="Level 1" bVrbl="0">
-					<Assignment MapLvl="1" MapName="main"></Assignment>
 					<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 				</MapLvlProxy>
 			</MapLvlProxies>
@@ -104,7 +73,7 @@
 		</MapLvlProxyCntnr>
 		<ProcVrblCntnr>
 			<ProcVrbl iId="0" eType="1">
-				<DValue value="100." type="double"></DValue>
+				<DValue value="85." type="double"></DValue>
 				<NameExpr strTextExpr="SP"></NameExpr>
 				<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 				<SharedInfo bShared="0" strInstGUID=""></SharedInfo>
@@ -243,13 +212,13 @@
 							<DValue value="" type="string" name="strInstGUID"></DValue>
 						</Params>
 					</PropDscr>
-					<PropDscr Flag="2147483650" strUserName="KFG_Segment" tChngTime="1762349376" group_id="global.object.vrbl.vrbl_arr.prop">
+					<PropDscr Flag="2147483650" strUserName="KFG_Segment" tChngTime="1762351413" group_id="global.object.vrbl.vrbl_arr.prop">
 						<PropDscrId GUID="5EB15E4B-593A-432f-A0ED-9B38627475D2" InstID="SP"></PropDscrId>
 						<LcnsInfo sLcnsId="" sPwd=""></LcnsInfo>
 						<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 						<Params>
 							<DValue value="_SP" type="string" name="NameExpr"></DValue>
-							<DValue value="100." type="double" name="vVal"></DValue>
+							<DValue value="85." type="double" name="vVal"></DValue>
 							<DValue value="0" type="bool" name="bShared"></DValue>
 							<DValue value="" type="string" name="strInstGUID"></DValue>
 						</Params>
@@ -267,18 +236,7 @@
 			</PropTree>
 			<Brightness>
 				<Map MapName="main">
-					<ChnlWghtBrght>
-						<BrghtWght val="1." chnl="0"></BrghtWght>
-						<BrghtWght val="1." chnl="1"></BrghtWght>
-						<BrghtWght val="1." chnl="2"></BrghtWght>
-						<BrghtWght val="1." chnl="3"></BrghtWght>
-						<BrghtWght val="1." chnl="4"></BrghtWght>
-						<BrghtWght val="1." chnl="5"></BrghtWght>
-						<BrghtWght val="1." chnl="6"></BrghtWght>
-						<BrghtWght val="1." chnl="7"></BrghtWght>
-						<BrghtWght val="1." chnl="8"></BrghtWght>
-						<BrghtWght val="1." chnl="9"></BrghtWght>
-					</ChnlWghtBrght>
+					<ChnlWghtBrght></ChnlWghtBrght>
 				</Map>
 			</Brightness>
 			<AllVrblClss></AllVrblClss>
@@ -298,8 +256,8 @@
 			<AllClss></AllClss>
 		</Smpls>
 		<plugin-list>
-			<plugin name="eCognition Internal Process Algorithms" version="0.1"></plugin>
 			<plugin name="eCognition Internal Export Process Algorithms" version="0.1"></plugin>
+			<plugin name="eCognition Internal Process Algorithms" version="0.1"></plugin>
 		</plugin-list>
 	</ObjectDependencies>
 	<CustProcAlgrList></CustProcAlgrList>
@@ -315,7 +273,6 @@
 					<DValue value="1" type="bool" name="bDoOverwrite"></DValue>
 					<DValue type="lvlName" name="valMapLvl">
 						<MapLvlProxy strName="Level 1" bVrbl="0">
-							<Assignment MapLvl="1" MapName="main"></Assignment>
 							<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 						</MapLvlProxy>
 					</DValue>
@@ -325,47 +282,59 @@
 						<Values>
 							<DValue type="vector" indx="0">
 								<Values>
-									<DValue type="img_chnl" value="elev" scope="" indx="0"></DValue>
-									<DValue value="1." type="double" indx="1"></DValue>
+									<DValue type="img_chnl" value="cosA" scope="" indx="0"></DValue>
+									<DValue value="0.5" type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
 							<DValue type="vector" indx="1">
 								<Values>
-									<DValue type="img_chnl" value="knc" scope="" indx="0"></DValue>
+									<DValue type="img_chnl" value="dem" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
 							<DValue type="vector" indx="2">
 								<Values>
-									<DValue type="img_chnl" value="kncc" scope="" indx="0"></DValue>
+									<DValue type="img_chnl" value="knc" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
 							<DValue type="vector" indx="3">
 								<Values>
+									<DValue type="img_chnl" value="kncc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="4">
+								<Values>
 									<DValue type="img_chnl" value="kncs" scope="" indx="0"></DValue>
 									<DValue value="2." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="4">
+							<DValue type="vector" indx="5">
 								<Values>
 									<DValue type="img_chnl" value="kns" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="5">
+							<DValue type="vector" indx="6">
 								<Values>
 									<DValue type="img_chnl" value="knss" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="6">
+							<DValue type="vector" indx="7">
+								<Values>
+									<DValue type="img_chnl" value="sinA" scope="" indx="0"></DValue>
+									<DValue value="0.5" type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="8">
 								<Values>
 									<DValue type="img_chnl" value="sinS" scope="" indx="0"></DValue>
 									<DValue value="2." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="7">
+							<DValue type="vector" indx="9">
 								<Values>
 									<DValue type="img_chnl" value="tc" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
@@ -377,47 +346,59 @@
 						<Values>
 							<DValue type="vector" indx="0">
 								<Values>
-									<DValue type="img_chnl" value="elev" scope="" indx="0"></DValue>
-									<DValue value="1." type="double" indx="1"></DValue>
+									<DValue type="img_chnl" value="cosA" scope="" indx="0"></DValue>
+									<DValue value="0.5" type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
 							<DValue type="vector" indx="1">
 								<Values>
-									<DValue type="img_chnl" value="knc" scope="" indx="0"></DValue>
+									<DValue type="img_chnl" value="dem" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
 							<DValue type="vector" indx="2">
 								<Values>
-									<DValue type="img_chnl" value="kncc" scope="" indx="0"></DValue>
+									<DValue type="img_chnl" value="knc" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
 							<DValue type="vector" indx="3">
 								<Values>
+									<DValue type="img_chnl" value="kncc" scope="" indx="0"></DValue>
+									<DValue value="1." type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="4">
+								<Values>
 									<DValue type="img_chnl" value="kncs" scope="" indx="0"></DValue>
 									<DValue value="2." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="4">
+							<DValue type="vector" indx="5">
 								<Values>
 									<DValue type="img_chnl" value="kns" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="5">
+							<DValue type="vector" indx="6">
 								<Values>
 									<DValue type="img_chnl" value="knss" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="6">
+							<DValue type="vector" indx="7">
+								<Values>
+									<DValue type="img_chnl" value="sinA" scope="" indx="0"></DValue>
+									<DValue value="0.5" type="double" indx="1"></DValue>
+								</Values>
+							</DValue>
+							<DValue type="vector" indx="8">
 								<Values>
 									<DValue type="img_chnl" value="sinS" scope="" indx="0"></DValue>
 									<DValue value="2." type="double" indx="1"></DValue>
 								</Values>
 							</DValue>
-							<DValue type="vector" indx="7">
+							<DValue type="vector" indx="9">
 								<Values>
 									<DValue type="img_chnl" value="tc" scope="" indx="0"></DValue>
 									<DValue value="1." type="double" indx="1"></DValue>
@@ -490,7 +471,6 @@
 				<Params>
 					<DValue type="lvlName" name="valMapLvl">
 						<MapLvlProxy strName="Level 1" bVrbl="0">
-							<Assignment MapLvl="1" MapName="main"></Assignment>
 							<Scope GUID="00000000-0000-0000-0000-000000000000"></Scope>
 						</MapLvlProxy>
 					</DValue>
