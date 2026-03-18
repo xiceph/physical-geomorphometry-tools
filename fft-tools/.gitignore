@@ -1,0 +1,17 @@
+# Rust / Cargo
+target/
+**/*.rs.bk
+Cargo.lock
+
+# IDEs
+.idea/
+.vscode/
+
+# Project-specific (Internal)
+conductor/
+GEMINI.md
+/results/
+
+# Backup files
+*~
+*.swp
