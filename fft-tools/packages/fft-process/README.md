@@ -19,6 +19,9 @@ This tool solves the problem of analyzing large DEMs that do not fit into memory
 
 ## Usage
 
+> [!IMPORTANT]
+> **Nodata Handling:** The input DEM must not contain "no data" values. Any processing blocks that contain `NaN` or `nodata` pixels will be skipped and reported as errors; please ensure your DEM is gap-filled or interpolated before processing.
+
 ### Command Line Arguments
 
 ```bash
@@ -32,9 +35,9 @@ fft-process [OPTIONS] --input <FILE> --output <DIR>
 #### Optional Arguments
 - `--window-size <PIXELS>`: The size of the square processing block (N x N). If omitted, uses the smaller dimension of the input raster.
 - `--overlap <PIXELS>`: The size of the overlap between adjacent blocks in pixels. Defaults to 50% of the window size.
-- `--detrend <ORDER>`: Apply polynomial detrending to each block. `1` for linear (planar), `2` for quadratic. If the flag is omitted, no detrending is performed. If the flag is provided without an order, it defaults to `1`.
+- `--detrend <ORDER>`: Apply polynomial detrending to each block. `1` for linear (planar), `2` for quadratic. **Defaults to `1`** (even if the flag is omitted). Specify `0` to explicitly disable detrending.
 - `--taper-type <TYPE>`: `inner` (standard window) or `outer` (tapered padding). Default is `outer`.
-- `--taper <WIDTH>`: Width of the taper in pixels. Defaults to 1/10th of the window size.
+- `--taper <WIDTH>`: Width of the taper in pixels. **Defaults to 1/10th of the window size** (even if the flag is omitted). Specify `0` to explicitly disable tapering.
 - `--min-pad <PIXELS>`: Minimum padding to add to the block. Default is `0`.
 - `--force-padding-size <SIZE>`: Force the final padded block to be exactly this size.
 - `--jobs <NUM>`: Number of parallel jobs to run. Defaults to 0 (all available cores).

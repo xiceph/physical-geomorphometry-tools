@@ -86,10 +86,11 @@ fn main() -> Result<()> {
 
     // Parse and validate detrending configuration.
     let detrend_config = match args.detrend {
+        Some(Some(0)) => None,
         Some(Some(order)) if order == 1 || order == 2 => Some(order),
-        Some(Some(order)) => anyhow::bail!("Detrend order must be 1 or 2, but received {}", order),
-        Some(None) => Some(1), // Default detrend order
-        None => None,
+        Some(Some(order)) => anyhow::bail!("Detrend order must be 0, 1 or 2, but received {}", order),
+        Some(None) => Some(1), // Default detrend order when flag is present but no value
+        None => Some(1),       // Default detrend order when flag is omitted
     };
 
     let ds = Dataset::open(&args.input).context("Failed to open input DEM")?;
@@ -108,9 +109,10 @@ fn main() -> Result<()> {
     };
 
     let taper_width_config = match args.taper {
+        Some(Some(0)) => None,
         Some(Some(width)) => Some(width),
         Some(None) => Some(final_window_size / 10), // Default to 1/10 of window_size
-        None => None,
+        None => Some(final_window_size / 10),       // Default to 1/10 even if omitted
     };
 
     // Create a ProcessConfig struct from parsed arguments.
@@ -143,11 +145,17 @@ fn main() -> Result<()> {
     println!("  {:<20} {}", "Overlap:", config.overlap);
     if let Some(order) = config.detrend {
         println!("  {:<20} {}", "Detrend Order:", order);
+    } else {
+        println!("  {:<20} {}", "Detrending:", "None");
     }
-    println!("  {:<20} {:?}", "Taper Type:", args.taper_type);
+
     if let Some(width) = taper_width_config {
+        println!("  {:<20} {:?}", "Taper Type:", args.taper_type);
         println!("  {:<20} {}", "Taper Width:", width);
+    } else {
+        println!("  {:<20} {}", "Tapering:", "None");
     }
+
     if let Some(min_pad) = config.min_padding {
         println!("  {:<20} {}", "Min Padding:", min_pad);
     }

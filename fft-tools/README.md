@@ -13,6 +13,41 @@ The toolkit addresses common challenges in geospatial FFT analysis, such as:
     - **2D PSD Normalization:** Implements physically-correct normalization ([m^4]) ensuring that the integral of the PSD equals the spatial variance of the terrain, and that PSD values remain independent of the FFT padding width.
     - **Polar Transformation:** Area-weighted polar transformations to ensure conservation of power when converting 2D spectra to 1D radial profiles.
 
+## Quick Start
+
+**No background in Fourier analysis is required to run a standard analysis.**
+The typical workflow reduces to three commands and five arguments. All other
+parameters have sensible defaults and can be ignored until you need them.
+
+### Step 1 — Compute the Power Spectral Density
+```bash
+fft-process --input my_dem.tif --output ./results/fft --window-size 512
+```
+*Processes your DEM in overlapping blocks and computes the 2D power spectrum.
+The `--window-size` should be smaller than the shortest side of your input (e.g., 512 or 1024) to ensure multiple regions are sampled. Default overlap (50%) and edge tapering are applied automatically.*
+
+### Step 2 — Convert to Polar Coordinates
+```bash
+fft-polar --input ./results/fft --output ./results/polar
+```
+*Reprojects the 2D spectra into wavenumber vs. angle space.
+Default binning (36 angular bins, 64 wavenumber bins) is applied automatically.*
+
+### Step 3 — Summarize and Plot
+```bash
+fft-analyze --input ./results/polar --output summary.csv \
+            --mode radial-mean --plot spectrum.html
+```
+*Produces a CSV radial power spectrum and an interactive HTML plot.*
+
+**Choosing `--mode`** — this is the one conceptual choice required:
+| Mode | Use when you want to know… |
+|---|---|
+| `radial-mean` | How roughness or energy varies with spatial scale (wavelength). Appropriate for most geomorphological studies. |
+| `angular-mean` | Whether terrain has a preferred orientation (e.g., fault lineaments, dune crests, glacial striae). |
+
+If in doubt, start with `radial-mean`.
+
 ## Tools
 
 The project is organized as a Cargo workspace with the following tools:
@@ -40,33 +75,38 @@ cargo build --release
 
 The compiled binaries will be available in `target/release/`.
 
-## Example Workflow
+## Example Workflow (Advanced)
 
-A typical analysis pipeline might look like this:
+The Quick Start above covers most use cases. The extended workflow below
+demonstrates optional filtering and reconstruction, and exposes additional
+parameters for users who need methodological control.
 
-1.  **Process the DEM:** Compute the PSD for 512x512 blocks with 50% overlap.
-    ```bash
-    ./target/release/fft-process --input input_dem.tif --output ./results/fft --window-size 512 --overlap 256
-    ```
+1. **Process the DEM** — 512×512 blocks, 50% overlap (explicit):
+```bash
+   fft-process --input input_dem.tif --output ./results/fft \
+               --window-size 512 --overlap 256
+```
 
-2.  **Polar Transformation:** Convert the Cartesian PSDs to polar coordinates.
-    ```bash
-    ./target/release/fft-polar --input ./results/fft --output ./results/polar
-    ```
+2. **Polar Transformation:**
+```bash
+   fft-polar --input ./results/fft --output ./results/polar
+```
 
-3.  **Analyze & Plot:** Generate a radial power spectrum summary and plot.
-    ```bash
-    ./target/release/fft-analyze --input ./results/polar --output summary.csv --plot spectrum_plot.html --mode radial-mean
-    ```
+3. **Analyze & Plot** — radial mean power spectrum:
+```bash
+   fft-analyze --input ./results/polar --output summary.csv \
+               --mode radial-mean --plot spectrum_plot.html
+```
 
-4.  **Filter & Reconstruct (Optional):** Remove high-frequency noise and reconstruct the DEM.
-    ```bash
-    # Apply a low-pass filter (keep wavelengths > 50m)
-    ./target/release/fft-filter --input ./results/fft --output ./results/filtered --min-wavelength 50
+4. **Filter & Reconstruct** *(optional — e.g., to remove high-frequency noise)*:
+```bash
+   # Keep only wavelengths longer than 50 m
+   fft-filter --input ./results/fft --output ./results/filtered \
+              --min-wavelength 50
 
-    # Inverse FFT to get the filtered DEM
-    ./target/release/fft-inverse --input ./results/filtered --output filtered_dem.tif
-    ```
+   # Reconstruct the filtered DEM
+   fft-inverse --input ./results/filtered --output filtered_dem.tif
+```
 
 ## License
 
