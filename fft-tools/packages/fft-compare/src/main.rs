@@ -357,10 +357,10 @@ fn main() -> Result<()> {
     let k_max_b = detect_spectral_limits(&b_b_ref.psd, &fx, &fy);
 
     // Use the intersection of effective bandwidths, and add a 50% margin to see the decay.
-    let theoretical_k_max = (fx.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2)
-        + fy.iter().cloned().fold(f64::NEG_INFINITY, f64::max).powi(2))
-    .sqrt();
-    let effective_k_max = (k_max_a.min(k_max_b) * 1.5).min(theoretical_k_max).max(k_min_limit * 2.0);
+    // We cap the k_max at the Nyquist frequency (1/2dx) to avoid artifacts in the radial mean
+    // caused by sampling only the corners of the 2D spectrum beyond the cardinal Nyquist limit.
+    let f_nyquist = 1.0 / (2.0 * mean_pixel_size);
+    let effective_k_max = (k_max_a.min(k_max_b) * 1.5).min(f_nyquist).max(k_min_limit * 2.0);
 
     // Adjust bins: focus on the range where data exists, maintaining resolution.
     let log_range = effective_k_max.log10() - k_min_limit.log10();
