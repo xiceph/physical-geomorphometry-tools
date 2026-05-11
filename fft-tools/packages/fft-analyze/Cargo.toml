@@ -19,6 +19,12 @@ fft-core = { path = "../fft-core" }
 charming = "0.6"
 console = "0.16.2"
 
+[build-dependencies]
+vcpkg = "0.2"
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+
 [dev-dependencies]
 approx = "0.5.1"
 assert_cmd = "2.1.2"

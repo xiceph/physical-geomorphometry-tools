@@ -8,6 +8,4 @@ fn main() {
       .find_package("gdal")
       .unwrap();
   }
-  println!("cargo:rustc-link-lib=dylib=blas");
-  println!("cargo:rustc-link-lib=dylib=lapack");
 }

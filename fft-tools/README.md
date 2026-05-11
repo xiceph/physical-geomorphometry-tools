@@ -62,18 +62,49 @@ The project is organized as a Cargo workspace with the following tools:
 
 ## Installation
 
-### Prerequisites
-- **Rust:** You will need a Rust toolchain installed (stable channel). [Install Rust](https://www.rust-lang.org/tools/install).
-- **GDAL:** The tools depend on the GDAL library for reading and writing geospatial raster files. Ensure GDAL development headers are installed on your system.
+You can either build the toolkit from source or download precompiled binaries for Windows.
 
-### Building from Source
-To build all tools in the workspace with optimizations enabled:
+### Option 1: Download Standalone Executables (Windows)
+
+Standalone Windows executables are available for download on the [Releases page](https://github.com/xiceph/physical-geomorphometry-tools/releases). No installation is needed — simply download the desired `.exe` files and run them from the command line.
+
+### Option 2: Build from Source
+
+To build the toolkit from source, follow these steps:
+
+#### Prerequisites
+
+- **Rust**: The tools are written in Rust, so you'll need a Rust development environment. [Install Rust](https://www.rust-lang.org/tools/install).
+- **GDAL**: A geospatial data abstraction library required for handling raster files.
+
+#### Building on Linux
+
+Ensure you have GDAL development headers installed (e.g., `libgdal-dev` on Ubuntu or `gdal-devel` on Fedora).
 
 ```bash
+git clone https://github.com/xiceph/physical-geomorphometry-tools.git
+cd physical-geomorphometry-tools/fft-tools/
 cargo build --release
 ```
 
-The compiled binaries will be available in `target/release/`.
+The compiled binaries will be located in the `target/release/` directory.
+
+#### Building on Windows
+
+Building on Windows requires the GDAL library. We recommend using **vcpkg** to manage this dependency and ensure a static build.
+
+1.  **Install vcpkg**: Follow the instructions at [vcpkg.io](https://vcpkg.io/).
+2.  **Install static GDAL via vcpkg**:
+    ```powershell
+    vcpkg install gdal:x86_64-windows-static
+    ```
+3.  **Set the VCPKG_ROOT environment variable**: Ensure `VCPKG_ROOT` points to your vcpkg installation directory.
+4.  **Build the toolkit**:
+    ```powershell
+    cd fft-tools
+    cargo build --release
+    ```
+    The build system will automatically detect the static GDAL library and produce standalone executables with the C runtime statically linked (CRT static).
 
 ## Example Workflow (Advanced)
 
