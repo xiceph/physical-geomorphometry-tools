@@ -74,8 +74,9 @@ To build the toolkit from source, follow these steps:
 
 #### Prerequisites
 
-- **Rust**: The tools are written in Rust, so you'll need a Rust development environment. [Install Rust](https://www.rust-lang.org/tools/install).
-- **GDAL**: A geospatial data abstraction library required for handling raster files.
+- **Rust**: [Install Rust](https://www.rust-lang.org/tools/install).
+- **GDAL**: Geospatial data abstraction library (required for raster I/O).
+- **Git**: For cloning the repository.
 
 #### Building on Linux
 
@@ -91,53 +92,79 @@ The compiled binaries will be located in the `target/release/` directory.
 
 #### Building on Windows
 
-Building on Windows requires the GDAL library. We recommend using **vcpkg** to manage this dependency and ensure a static build.
+Building on Windows requires the MSVC toolchain and a static GDAL build. The toolkit uses **Intel MKL** (`intel-mkl-static`) to ensure reliable linking and performance.
 
-1.  **Install vcpkg**: Follow the instructions at [vcpkg.io](https://vcpkg.io/).
-2.  **Install static GDAL via vcpkg**:
+1.  **Prerequisites:**
+    - **Rust**: [Install Rust](https://www.rust-lang.org/tools/install) (MSVC toolchain).
+    - **Visual Studio 2022**: Install the "Desktop development with C++" workload.
+    - **vcpkg**: [Install and bootstrap](https://vcpkg.io/en/getting-started.html) vcpkg.
+
+2.  **Install GDAL:**
     ```powershell
-    vcpkg install gdal:x86_64-windows-static
+    .\vcpkg\vcpkg install gdal:x64-windows-static
     ```
-3.  **Set the VCPKG_ROOT environment variable**: Ensure `VCPKG_ROOT` points to your vcpkg installation directory.
-4.  **Build the toolkit**:
+
+3.  **Setup Environment:**
+    Open a **Developer PowerShell for VS 2022** and set the required variables:
+    ```powershell
+    $env:VCPKG_ROOT = "C:\path\to\vcpkg"
+    $env:VCPKGRS_TRIPLET = "x64-windows-static"
+    ```
+
+4.  **Build:**
     ```powershell
     cd fft-tools
     cargo build --release
     ```
-    The build system will automatically detect the static GDAL library and produce standalone executables with the C runtime statically linked (CRT static).
+
+**Troubleshooting:**
+- **Linking errors (`dgetrf_`):** Ensure the `intel-mkl-static` feature is enabled in `Cargo.toml`.
+- **VcpkgNotFound:** Verify `$env:VCPKG_ROOT` is set correctly.
+- **Compiler errors:** Always use a **Developer Shell** to ensure MSVC tools (like `dumpbin.exe`) are in your PATH.
 
 ## Example Workflow (Advanced)
 
-The Quick Start above covers most use cases. The extended workflow below
-demonstrates optional filtering and reconstruction, and exposes additional
-parameters for users who need methodological control.
+The Quick Start covers standard cases. This extended workflow demonstrates how to exercise precise methodological control over the spectral pipeline. **For a full list of parameters and detailed explanations, refer to the README in each package's directory.**
 
-1. **Process the DEM** — 512×512 blocks, 50% overlap (explicit):
-```bash
+1. **Process with High-Precision Preprocessing**
+   Use 2nd-order detrending and explicit tapered padding (64-pixel taper with a minimum 64-pixel additional zero-padding) to minimize edge artifacts and spectral leakage.
+   ```bash
    fft-process --input input_dem.tif --output ./results/fft \
-               --window-size 512 --overlap 256
-```
+               --window-size 512 --overlap 256 \
+               --detrend 2 --taper-type outer --taper 64 --min-pad 64
+   ```
 
-2. **Polar Transformation:**
-```bash
-   fft-polar --input ./results/fft --output ./results/polar
-```
+2. **High-Resolution Polar Transformation**
+   Refine the angular and radial resolution for a more detailed isotropic analysis while ensuring bins remain well-populated.
+   ```bash
+   fft-polar --input ./results/fft --output ./results/polar \
+              --n-angles 45 --n-wavenumbers 80
+   ```
 
-3. **Analyze & Plot** — radial mean power spectrum:
-```bash
+3. **Subsetting and Detrending Analysis**
+   Focus on specific spatial scales (e.g., 10m to 1000m) and apply log-log detrending to the radial profile to better identify slope breaks.
+   ```bash
    fft-analyze --input ./results/polar --output summary.csv \
-               --mode radial-mean --plot spectrum_plot.html
-```
+               --mode radial-mean --plot spectrum.html \
+               --wavelength-bounds 10,1000 --detrend 1
+   ```
 
-4. **Filter & Reconstruct** *(optional — e.g., to remove high-frequency noise)*:
-```bash
-   # Keep only wavelengths longer than 50 m
+4. **Filter with Precise Transition Bands**
+   Apply a band-pass filter with a custom cosine taper (`--taper-width 0.2`) to the transition zones to minimize the Gibbs phenomenon while preserving target frequencies.
+   ```bash
    fft-filter --input ./results/fft --output ./results/filtered \
-              --min-wavelength 50
+              --min-wavelength 20 --max-wavelength 500 --taper-width 0.2
 
-   # Reconstruct the filtered DEM
+   # Reconstruct the filtered terrain
    fft-inverse --input ./results/filtered --output filtered_dem.tif
-```
+   ```
+
+5. **Quantify Spectral Information Loss**
+   Use `fft-compare` to quantify the difference between the original and processed (e.g., filtered or generalized) DEMs, identifying the "effective resolution" where coherence drops.
+   ```bash
+   fft-compare --input-a ./results/fft --input-b ./results/filtered \
+               --output ./results/comparison --plot comparison.html
+   ```
 
 ## License
 
