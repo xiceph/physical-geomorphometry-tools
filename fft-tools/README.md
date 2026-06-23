@@ -10,8 +10,12 @@ The toolkit addresses common challenges in geospatial FFT analysis, such as:
 - **Large Dataset Handling:** Efficient block-based processing to handle DEMs larger than available memory.
 - **Edge Effects:** Configurable windowing (tapering) and padding strategies to minimize spectral leakage.
 - **Physical Correctness:** 
-    - **2D PSD Normalization:** Implements physically-correct normalization ([m^4]) ensuring that the integral of the PSD equals the spatial variance of the terrain, and that PSD values remain independent of the FFT padding width.
+    - **2D PSD Normalization:** Implements physically-correct normalization ([m⁴]) ensuring that the integral of the PSD equals the spatial variance of the terrain, and that PSD values remain independent of the FFT padding width.
     - **Polar Transformation:** Area-weighted polar transformations to ensure conservation of power when converting 2D spectra to 1D radial profiles.
+
+## Theoretical Background
+
+The core methodology implemented in this toolkit is described in *A modular toolkit for block-based spatially explicit spectral analysis of digital elevation models* by Feciskanin (2026)[^1]. The paper presents a framework for spatially localized FFT analysis of digital elevation models, including moving-window spectral decomposition, mitigation of spectral leakage through extrapolated tapering, physically consistent power spectral density estimation, anisotropy analysis, spectral filtering, and quantitative comparison of DEM datasets in the frequency domain. For a comprehensive description of the theoretical foundations and methodological design, please refer to the original publication.
 
 ## Quick Start
 
@@ -169,3 +173,7 @@ The Quick Start covers standard cases. This extended workflow demonstrates how t
 ## License
 
 This project is open-source. Please refer to the [LICENSE](LICENSE) file for details.
+
+
+
+[^1]: Feciskanin, R., 2026. *A modular toolkit for block-based spatially explicit spectral analysis of digital elevation models*. Computers & Geosciences, 215, 106216. https://doi.org/10.1016/j.cageo.2026.106216
